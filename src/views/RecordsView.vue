@@ -2,8 +2,7 @@
      <div class="container section-padding fade-in">
           <header class="page-header">
                <h1 class="page-title">Catálogo de <span class="highlight">Registros</span></h1>
-               <p class="page-subtitle">Explora nuestro archivo completo con más de {{ totalItems }} registros
-                    digitalizados.</p>
+               <p class="page-subtitle">Explora todos los registros disponibles.</p>
           </header>
 
           <!-- Barra de Herramientas -->

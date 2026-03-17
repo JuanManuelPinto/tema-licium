@@ -14,7 +14,7 @@
                          <router-link to="/" class="nav-link" active-class="active">Inicio</router-link>
                          <router-link to="/explore" class="nav-link" active-class="active">Registros</router-link>
                          <router-link to="/collections" class="nav-link" active-class="active">Colecciones</router-link>
-                         <router-link to="/search" class="nav-link" active-class="active">Buscador</router-link>
+                         <!-- <router-link to="/search" class="nav-link" active-class="active">Buscador</router-link> -->
                     </nav>
 
                     <!-- Botón Hamburguesa móvil -->
@@ -216,9 +216,17 @@ watch(() => route.path, () => {
      }
 
      /* Staggered animation for links */
-     .app-nav.nav-open .nav-link:nth-child(2) { transition-delay: 0.2s; }
-     .app-nav.nav-open .nav-link:nth-child(3) { transition-delay: 0.3s; }
-     .app-nav.nav-open .nav-link:nth-child(4) { transition-delay: 0.4s; }
+     .app-nav.nav-open .nav-link:nth-child(2) {
+          transition-delay: 0.2s;
+     }
+
+     .app-nav.nav-open .nav-link:nth-child(3) {
+          transition-delay: 0.3s;
+     }
+
+     .app-nav.nav-open .nav-link:nth-child(4) {
+          transition-delay: 0.4s;
+     }
 
      .hamburger.is-active span:nth-child(1) {
           transform: translateY(9px) rotate(45deg);

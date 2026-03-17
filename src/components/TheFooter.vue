@@ -13,30 +13,30 @@
                     </p>
                </div>
 
-                <!-- Grid de enlaces rápidos -->
+               <!-- Grid de enlaces rápidos -->
                <div class="footer-links-grid">
                     <div class="footer-group">
                          <h3 class="footer-heading">Explorar</h3>
                          <ul class="footer-list">
                               <li><router-link to="/">Inicio</router-link></li>
                               <li><router-link to="/collections">Colecciones</router-link></li>
-                              <li><router-link to="/search">Buscador Avanzado</router-link></li>
+                              <!-- <li><router-link to="/search">Buscador Avanzado</router-link></li> -->
                               <li><router-link to="/explore">Registros</router-link></li>
                          </ul>
                     </div>
                     <div class="footer-group">
                          <h3 class="footer-heading">Información</h3>
                          <ul class="footer-list">
-                              <li><a href="#">Sobre el Archivo</a></li>
-                              <li><a href="#">Guía de Uso</a></li>
-                              <li><a href="#">Política de Privacidad</a></li>
+                              <li><a href="#">Licium Theme</a></li>
+                              <li><a href="#">Licium Theme</a></li>
+                              <li><a href="#">Licium Theme</a></li>
                          </ul>
                     </div>
                     <div class="footer-group">
                          <h3 class="footer-heading">Contacto</h3>
                          <ul class="footer-list">
-                              <li><a href="mailto:info@licium.eu">info@licium.eu</a></li>
-                              <li><span>Tel: +34 900 000 000</span></li>
+                              <li><a href="#">Licium Theme</a></li>
+                              <li><span>Licium Theme</span></li>
                          </ul>
                     </div>
                </div>

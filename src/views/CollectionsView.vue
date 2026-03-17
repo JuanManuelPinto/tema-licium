@@ -1,9 +1,8 @@
 <template>
      <div class="container section-padding fade-in">
           <header class="page-header">
-               <h1 class="page-title">Archivo de <span class="highlight">Colecciones</span></h1>
-               <p class="page-subtitle">Descubre el patrimonio organizado por temáticas, autores y series históricas.
-               </p>
+               <h1 class="page-title">Listado de <span class="highlight">Colecciones</span></h1>
+               <p class="page-subtitle">Explora todas las colecciones disponibles.</p>
           </header>
 
           <div class="toolbar" v-if="!loading">

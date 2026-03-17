@@ -9,9 +9,8 @@
                </div>
 
                <div class="container hero-content">
-                    <h1 class="hero-title">Patrimonio Cultural <br /> <span class="highlight">LICIUM</span></h1>
-                    <p class="hero-text">Explora miles de registros históricos digitales preservados para el futuro con
-                         tecnología de vanguardia.</p>
+                    <h1 class="hero-title">Ejemplo Theme <br /> <span class="highlight">LICIUM</span></h1>
+                    <p class="hero-text">Tema propio de Licium.</p>
 
                     <div class="search-box">
                          <input v-model="searchQuery" type="text" placeholder="¿Qué deseas encontrar?"
@@ -33,7 +32,7 @@
                     <div class="section-header">
                          <div class="header-titles">
                               <h2 class="title-lg">Colecciones Destacadas</h2>
-                              <p class="subtitle">Descubre el archivo a través de nuestras series temáticas.</p>
+                              <p class="subtitle">Descubre todas nuestras colecciones.</p>
                          </div>
                          <router-link to="/collections" class="btn-outline">Ver todas</router-link>
                     </div>
@@ -58,11 +57,10 @@
           <section class="cta-banner">
                <div class="container cta-inner">
                     <div class="cta-text">
-                         <h2 class="cta-title">Archivo Histórico Digital</h2>
-                         <p>Accede a herramientas de investigación avanzada y descarga de metadatos en formato abierto.
-                         </p>
+                         <h2 class="cta-title">Buscador Avanzado</h2>
+                         <p>Accede al buscador de registros y colecciones avanzado.</p>
                     </div>
-                    <router-link to="/search" class="btn-primary">Buscador Técnico</router-link>
+                    <router-link to="/search" class="btn-primary">Buscador Avanzado</router-link>
                </div>
           </section>
 
@@ -71,8 +69,8 @@
                <div class="container">
                     <div class="section-header">
                          <div class="header-titles">
-                              <h2 class="title-lg">Últimas Incorporaciones</h2>
-                              <p class="subtitle">Obras y documentos recientemente digitalizados.</p>
+                              <h2 class="title-lg">Últimos Registros</h2>
+                              <p class="subtitle">Registros añadidos recientemente.</p>
                          </div>
                          <router-link to="/explore" class="link-more">Explorar catálogo →</router-link>
                     </div>

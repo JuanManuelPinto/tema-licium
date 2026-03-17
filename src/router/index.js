@@ -39,11 +39,11 @@ const router = createRouter({
                name: 'collection-detail',
                component: CollectionDetail, // Detalle de una colección y sus obras
           },
-          {
-               path: '/search',
-               name: 'search',
-               component: SearchView, // Buscador avanzado
-          },
+          // {
+          //      path: '/search',
+          //      name: 'search',
+          //      component: SearchView, // Buscador avanzado
+          // },
      ],
      // Comportamiento del scroll: volver siempre arriba al cambiar de página
      scrollBehavior(to, from, savedPosition) {
