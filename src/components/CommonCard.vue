@@ -124,10 +124,12 @@ const thumbUrl = computed(() => {
      font-size: 1.25rem;
      margin-bottom: 0.8rem;
      display: -webkit-box;
-     -webkit-line-clamp: 2;
-     line-clamp: 2;
+     -webkit-line-clamp: 3;
+     line-clamp: 3;
      -webkit-box-orient: vertical;
      overflow: hidden;
+     overflow-wrap: anywhere;
+     word-break: break-word;
 }
 
 .card-text {
@@ -149,7 +151,7 @@ const thumbUrl = computed(() => {
 /* List Mode */
 .view-list {
      flex-direction: row;
-     height: 200px;
+     height: auto;
 }
 
 .view-list .card-media {
@@ -158,7 +160,20 @@ const thumbUrl = computed(() => {
 }
 
 .view-list .card-body {
-     justify-content: center;
+     justify-content: flex-start;
+     min-width: 0; /* clave en flex-row para permitir que el texto envuelva */
+     flex: 1 1 auto;
+}
+
+.view-list .card-title {
+     /* En lista priorizamos legibilidad: sin clamp para evitar títulos cortados */
+     display: block !important;
+     -webkit-line-clamp: initial;
+     line-clamp: initial;
+     -webkit-box-orient: initial;
+     overflow: visible;
+     white-space: normal;
+     max-width: 100%;
 }
 
 /* Magazine Mode - Diseño más elegante y editorial */

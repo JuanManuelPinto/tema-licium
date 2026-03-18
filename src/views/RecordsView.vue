@@ -31,10 +31,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import CommonCard from '../components/CommonCard.vue';
 import ThePagination from '../components/ThePagination.vue';
+
+const route = useRoute();
+const router = useRouter();
 
 const records = ref([]);
 const loading = ref(true);
@@ -42,6 +46,41 @@ const viewMode = ref('grid');
 const currentPage = ref(1);
 const totalItems = ref(0);
 const itemsPerPage = ref(24);
+
+const allowedViewModes = new Set(['grid', 'list', 'magazine']);
+const isSyncingFromRoute = ref(false);
+
+const parsePage = (p) => {
+     const n = Number.parseInt(String(p ?? ''), 10);
+     return Number.isFinite(n) && n > 0 ? n : 1;
+};
+
+const parseView = (v) => {
+     const s = String(v ?? '');
+     return allowedViewModes.has(s) ? s : 'grid';
+};
+
+const syncStateFromRoute = () => {
+     isSyncingFromRoute.value = true;
+     viewMode.value = parseView(route.query.view);
+     currentPage.value = parsePage(route.query.page);
+     isSyncingFromRoute.value = false;
+};
+
+const pushStateToRoute = async () => {
+     if (isSyncingFromRoute.value) return;
+     const nextQuery = {
+          ...route.query,
+          view: viewMode.value,
+          page: String(currentPage.value),
+     };
+
+     // Evitar navegación redundante
+     if (route.query.view === nextQuery.view && String(route.query.page ?? '') === nextQuery.page) return;
+
+     // Usamos push para que el botón "atrás" recupere el estado anterior (modo/página)
+     await router.push({ query: nextQuery });
+};
 
 const fetchRecords = async () => {
      loading.value = true;
@@ -62,10 +101,35 @@ const fetchRecords = async () => {
 
 const onPageChange = (p) => {
      currentPage.value = p;
-     fetchRecords();
 };
 
-onMounted(fetchRecords);
+// 1) Inicializa desde la URL (para soportar "atrás" y recargas)
+onMounted(() => {
+     syncStateFromRoute();
+     fetchRecords();
+});
+
+// 2) Si cambia la URL (ej. botón atrás), actualiza estado y refetch si procede
+watch(
+     () => [route.query.page, route.query.view],
+     () => {
+          const nextPage = parsePage(route.query.page);
+          const nextView = parseView(route.query.view);
+          const shouldRefetch = nextPage !== currentPage.value;
+          viewMode.value = nextView;
+          currentPage.value = nextPage;
+          if (shouldRefetch) fetchRecords();
+     }
+);
+
+// 3) Si cambia el estado por UI (modo/paginación), lo reflejamos en la URL y refetch en cambios de página
+watch(viewMode, () => {
+     pushStateToRoute();
+});
+watch(currentPage, () => {
+     pushStateToRoute();
+     fetchRecords();
+});
 </script>
 
 <style scoped>

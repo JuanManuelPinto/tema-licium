@@ -29,10 +29,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import CommonCard from '../components/CommonCard.vue';
 import ThePagination from '../components/ThePagination.vue';
+
+const route = useRoute();
+const router = useRouter();
 
 const collections = ref([]);
 const loading = ref(true);
@@ -40,6 +44,39 @@ const viewMode = ref('grid');
 const currentPage = ref(1);
 const totalItems = ref(0);
 const itemsPerPage = ref(12);
+
+const allowedViewModes = new Set(['grid', 'list', 'magazine']);
+const isSyncingFromRoute = ref(false);
+
+const parsePage = (p) => {
+     const n = Number.parseInt(String(p ?? ''), 10);
+     return Number.isFinite(n) && n > 0 ? n : 1;
+};
+
+const parseView = (v) => {
+     const s = String(v ?? '');
+     return allowedViewModes.has(s) ? s : 'grid';
+};
+
+const syncStateFromRoute = () => {
+     isSyncingFromRoute.value = true;
+     viewMode.value = parseView(route.query.view);
+     currentPage.value = parsePage(route.query.page);
+     isSyncingFromRoute.value = false;
+};
+
+const pushStateToRoute = async () => {
+     if (isSyncingFromRoute.value) return;
+     const nextQuery = {
+          ...route.query,
+          view: viewMode.value,
+          page: String(currentPage.value),
+     };
+
+     if (route.query.view === nextQuery.view && String(route.query.page ?? '') === nextQuery.page) return;
+
+     await router.push({ query: nextQuery });
+};
 
 const fetchCollections = async () => {
      loading.value = true;
@@ -60,10 +97,32 @@ const fetchCollections = async () => {
 
 const onPageChange = (p) => {
      currentPage.value = p;
-     fetchCollections();
 };
 
-onMounted(fetchCollections);
+onMounted(() => {
+     syncStateFromRoute();
+     fetchCollections();
+});
+
+watch(
+     () => [route.query.page, route.query.view],
+     () => {
+          const nextPage = parsePage(route.query.page);
+          const nextView = parseView(route.query.view);
+          const shouldRefetch = nextPage !== currentPage.value;
+          viewMode.value = nextView;
+          currentPage.value = nextPage;
+          if (shouldRefetch) fetchCollections();
+     }
+);
+
+watch(viewMode, () => {
+     pushStateToRoute();
+});
+watch(currentPage, () => {
+     pushStateToRoute();
+     fetchCollections();
+});
 </script>
 
 <style scoped>

@@ -207,7 +207,14 @@ watch(() => route.path, () => {
 
 @media (max-width: 768px) {
      .app-main {
-          padding: var(--spacing-xl) 0;
+          /* En móvil añadimos “gutter” lateral para que el contenido no toque los bordes */
+          padding: var(--spacing-xl) 1rem;
+     }
+
+     /* Si la vista ya viene envuelta en .container (caso habitual), evitamos doble padding */
+     .app-main :deep(> .container) {
+          padding-left: 0;
+          padding-right: 0;
      }
 }
 

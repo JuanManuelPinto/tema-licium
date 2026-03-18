@@ -90,11 +90,12 @@
                               <h3 class="filter-label">Colección específica</h3>
                               <button v-if="form.collection" class="btn-reset-single" @click="form.collection = ''">×</button>
                          </div>
-                         <select v-model="form.collection" class="main-select">
+                         <select v-model="form.collection" class="main-select" :disabled="form.scope !== 'registros'">
                               <option value="">Todas las colecciones</option>
                               <option v-for="col in collectionsList" :key="col.id" :value="col.id">{{ col.title }}
                               </option>
                          </select>
+                         <p v-if="form.scope !== 'registros'" class="field-hint">Solo disponible para búsqueda de registros.</p>
                     </div>
 
                     <button class="btn-primary w-full" @click="handleNewSearch" :disabled="loading">
@@ -167,7 +168,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
+import { reactive, ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import CommonCard from '../components/CommonCard.vue';
@@ -209,6 +210,13 @@ const form = reactive({
      combine: 'Y',
      rules: [{ field: 'title', operator: 'contains', value: '' }],
      collection: ''
+});
+
+// Resetear colección si el ámbito no es registros
+watch(() => form.scope, (newScope) => {
+     if (newScope !== 'registros') {
+          form.collection = '';
+     }
 });
 
 const loading = ref(false);
@@ -497,6 +505,11 @@ const executeSearch = async () => {
      background: none;
      padding: 0.8rem 1rem 0.8rem 2.5rem;
      outline: none;
+     color: var(--text-primary);
+}
+
+.input-with-icon input::placeholder {
+     color: var(--text-muted);
 }
 
 .input-with-icon svg {
@@ -590,6 +603,11 @@ const executeSearch = async () => {
      padding: 0.4rem;
      border-radius: 4px;
      font-size: 0.85rem;
+     color: var(--text-primary);
+}
+
+.rule-box input::placeholder {
+     color: var(--text-muted);
 }
 
 .btn-remove {
@@ -645,6 +663,13 @@ const executeSearch = async () => {
      border-radius: var(--radius-sm);
      border: 1px solid var(--border-color);
      background: var(--bg-color);
+     color: var(--text-primary);
+}
+
+.main-select:disabled {
+     opacity: 0.5;
+     cursor: not-allowed;
+     background: var(--border-color);
 }
 
 .w-full {
