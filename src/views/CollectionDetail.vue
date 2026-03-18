@@ -193,7 +193,25 @@ onMounted(() => { fetchInfo(); fetchRecords(); });
 
 @media (max-width: 768px) {
      .collection-hero {
-          height: 400px;
+          height: auto;
+          min-height: 350px;
+          margin-bottom: 3rem;
+          border-radius: var(--radius-md);
+     }
+
+     .hero-title {
+          font-size: var(--fs-2xl);
+     }
+
+     .hero-desc {
+          font-size: 1rem;
+     }
+
+     .section-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5rem;
+          margin-bottom: 2rem;
      }
 }
 </style>

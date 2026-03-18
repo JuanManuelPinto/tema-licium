@@ -20,7 +20,7 @@
                          <ul class="footer-list">
                               <li><router-link to="/">Inicio</router-link></li>
                               <li><router-link to="/collections">Colecciones</router-link></li>
-                              <!-- <li><router-link to="/search">Buscador Avanzado</router-link></li> -->
+                              <li><router-link to="/search">Buscador Avanzado</router-link></li>
                               <li><router-link to="/explore">Registros</router-link></li>
                          </ul>
                     </div>

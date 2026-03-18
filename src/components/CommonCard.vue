@@ -55,7 +55,7 @@ const thumbUrl = computed(() => {
      let full = path.startsWith('http') ? path : `${domain}${path}`;
 
      // Optimización de tamaño según modo
-     if (props.viewMode === 'banners') return full.replace(/size=\w+/, 'size=large');
+     if (props.viewMode === 'magazine') return full.replace(/size=\w+/, 'size=large');
      return full.replace(/size=\w+/, 'size=medium');
 });
 </script>
@@ -69,6 +69,8 @@ const thumbUrl = computed(() => {
      border-radius: var(--radius-lg);
      overflow: hidden;
      transition: all var(--transition-normal);
+     text-decoration: none;
+     color: inherit;
 }
 
 .card-item:hover {
@@ -159,45 +161,108 @@ const thumbUrl = computed(() => {
      justify-content: center;
 }
 
-/* Banner Mode */
-.view-banners {
+/* Magazine Mode - Diseño más elegante y editorial */
+.view-magazine {
      flex-direction: row;
-     min-height: 400px;
+     min-height: 450px;
+     background: var(--surface-card);
+     border: none;
+     border-radius: 0;
+     border-bottom: 1px solid var(--border-color);
 }
 
-.view-banners .card-media {
-     width: 45%;
+.view-magazine:hover {
+     transform: none;
+     box-shadow: none;
+     background: rgba(212, 175, 55, 0.03);
+}
+
+.view-magazine.is-reverse {
+     flex-direction: row-reverse;
+}
+
+.view-magazine .card-media {
+     width: 50%;
      aspect-ratio: auto;
+     background: transparent;
 }
 
-.view-banners .card-body {
-     padding: 4rem;
+.view-magazine .card-img {
+     padding: 3rem;
+     object-fit: contain;
+}
+
+.view-magazine .card-body {
+     padding: 5rem;
      justify-content: center;
+     max-width: 600px;
 }
 
-.view-banners .card-title {
-     font-size: 2.5rem;
-     -webkit-line-clamp: 3;
-     line-clamp: 3;
+.view-magazine .card-title {
+     font-size: 3rem;
+     font-family: var(--font-heading);
+     line-height: 1.1;
+     margin-bottom: 2rem;
+     -webkit-line-clamp: 4;
+     line-clamp: 4;
+     color: var(--text-primary);
 }
 
-.view-banners .card-text {
-     font-size: 1.1rem;
+.view-magazine .card-text {
+     font-size: 1.2rem;
+     line-height: 1.8;
+     color: var(--text-secondary);
+     margin-bottom: 3rem;
+}
+
+.view-magazine .card-badge {
+     top: 2rem;
+     left: 2rem;
+     right: auto;
+}
+
+.view-magazine.is-reverse .card-badge {
+     right: 2rem;
+     left: auto;
+}
+
+.view-magazine .btn-more {
+     letter-spacing: 0.1em;
+     border-bottom: 2px solid var(--primary-color);
+     padding-bottom: 0.5rem;
+     width: fit-content;
+}
+
+@media (max-width: 1100px) {
+     .view-magazine .card-body {
+          padding: 3rem;
+     }
+
+     .view-magazine .card-title {
+          font-size: 2.2rem;
+     }
 }
 
 @media (max-width: 900px) {
-     .view-banners {
-          flex-direction: column;
+     .view-magazine {
+          flex-direction: column !important;
           height: auto;
+          min-height: auto;
+          padding-bottom: 3rem;
      }
 
-     .view-banners .card-media {
+     .view-magazine .card-media {
           width: 100%;
           aspect-ratio: 16/9;
      }
 
-     .view-banners .card-body {
+     .view-magazine .card-body {
           padding: 2rem;
+          max-width: 100%;
+     }
+
+     .view-magazine .card-title {
+          font-size: 1.8rem;
      }
 }
 

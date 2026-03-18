@@ -8,7 +8,7 @@
           <!-- Barra de Herramientas -->
           <div class="toolbar" v-if="!loading">
                <div class="view-options">
-                    <button v-for="mode in ['grid', 'list', 'banners']" :key="mode" @click="viewMode = mode"
+                    <button v-for="mode in ['grid', 'list', 'magazine']" :key="mode" @click="viewMode = mode"
                          :class="{ 'active': viewMode === mode }">
                          {{ mode }}
                     </button>
@@ -132,19 +132,30 @@ onMounted(fetchRecords);
 }
 
 .grid-system.view-grid {
-     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+     grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
 }
 
 .grid-system.view-list,
-.grid-system.view-banners {
+.grid-system.view-magazine {
      grid-template-columns: 1fr;
 }
 
 @media (max-width: 768px) {
      .toolbar {
           flex-direction: column;
-          gap: 1rem;
+          gap: 1.2rem;
           text-align: center;
+          padding: 1.5rem;
+          margin-bottom: 2rem;
+     }
+
+     .view-options {
+          width: 100%;
+          justify-content: center;
+     }
+
+     .grid-system {
+          gap: 1.5rem;
      }
 }
 </style>

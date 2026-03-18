@@ -14,15 +14,40 @@
                          <router-link to="/" class="nav-link" active-class="active">Inicio</router-link>
                          <router-link to="/explore" class="nav-link" active-class="active">Registros</router-link>
                          <router-link to="/collections" class="nav-link" active-class="active">Colecciones</router-link>
-                         <!-- <router-link to="/search" class="nav-link" active-class="active">Buscador</router-link> -->
+                         <router-link to="/search" class="nav-link" active-class="active">Buscador</router-link>
                     </nav>
 
-                    <!-- Botón Hamburguesa móvil -->
-                    <button class="mobile-toggle" @click="toggleMenu" :aria-expanded="isMenuOpen">
-                         <div class="hamburger" :class="{ 'is-active': isMenuOpen }">
-                              <span></span><span></span><span></span>
-                         </div>
-                    </button>
+                    <!-- Acciones del Header -->
+                    <div class="header-actions">
+                         <!-- Selector de Tema -->
+                         <button class="theme-toggle" @click="toggleTheme"
+                              :title="isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
+                              <svg v-if="isDark" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                   stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                   stroke-linejoin="round">
+                                   <circle cx="12" cy="12" r="5" />
+                                   <line x1="12" y1="1" x2="12" y2="3" />
+                                   <line x1="12" y1="21" x2="12" y2="23" />
+                                   <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                                   <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                                   <line x1="1" y1="12" x2="3" y2="12" />
+                                   <line x1="21" y1="12" x2="23" y2="12" />
+                                   <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                                   <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                              </svg>
+                              <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                   <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                              </svg>
+                         </button>
+
+                         <!-- Botón Hamburguesa móvil -->
+                         <button class="mobile-toggle" @click="toggleMenu" :aria-expanded="isMenuOpen">
+                              <div class="hamburger" :class="{ 'is-active': isMenuOpen }">
+                                   <span></span><span></span><span></span>
+                              </div>
+                         </button>
+                    </div>
                </div>
           </header>
 
@@ -36,11 +61,12 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import TheFooter from './components/TheFooter.vue';
 
 const isMenuOpen = ref(false);
+const isDark = ref(false);
 const route = useRoute();
 
 const toggleMenu = () => {
@@ -48,6 +74,24 @@ const toggleMenu = () => {
      // Prevenir scroll en el body cuando el menú está abierto
      document.body.style.overflow = isMenuOpen.value ? 'hidden' : '';
 };
+
+const toggleTheme = () => {
+     isDark.value = !isDark.value;
+     const theme = isDark.value ? 'dark' : 'light';
+     document.documentElement.setAttribute('data-theme', theme);
+     localStorage.setItem('licium-theme', theme);
+};
+
+onMounted(() => {
+     const savedTheme = localStorage.getItem('licium-theme');
+     if (savedTheme) {
+          isDark.value = savedTheme === 'dark';
+     } else {
+          // Detectar preferencia del sistema si no hay nada guardado
+          isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
+     }
+     document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light');
+});
 
 // Cerrar menú al cambiar de ruta
 watch(() => route.path, () => {
@@ -101,6 +145,31 @@ watch(() => route.path, () => {
      gap: 2.5rem;
 }
 
+.header-actions {
+     display: flex;
+     align-items: center;
+     gap: 1.5rem;
+}
+
+.theme-toggle {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     width: 40px;
+     height: 40px;
+     border-radius: var(--radius-full);
+     color: var(--text-primary);
+     background: var(--bg-color);
+     border: 1px solid var(--border-color);
+     transition: all var(--transition-normal);
+}
+
+.theme-toggle:hover {
+     border-color: var(--primary-color);
+     color: var(--primary-color);
+     background: var(--surface-color);
+}
+
 .nav-link {
      font-size: var(--fs-sm);
      font-weight: 600;
@@ -133,7 +202,13 @@ watch(() => route.path, () => {
 
 .app-main {
      flex: 1;
-     padding: var(--spacing-xl) 0;
+     padding: var(--spacing-3xl) 0;
+}
+
+@media (max-width: 768px) {
+     .app-main {
+          padding: var(--spacing-xl) 0;
+     }
 }
 
 /* MENÚ MÓVIL */
