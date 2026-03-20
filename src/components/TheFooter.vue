@@ -1,8 +1,8 @@
 <template>
-     <!-- Pie de página con información de contacto y enlaces -->
+     <!-- Pie de página global que proporciona navegación secundaria e información institucional -->
      <footer class="app-footer">
           <div class="container footer-inner">
-               <!-- Sección de la marca -->
+               <!-- Sección de identidad: Logotipo y eslogan de la marca -->
                <div class="footer-brand-section">
                     <div class="brand">
                          <h2 class="brand-text">LICIUM</h2>
@@ -13,8 +13,9 @@
                     </p>
                </div>
 
-               <!-- Grid de enlaces rápidos -->
+               <!-- Malla de navegación: Agrupación de enlaces por categorías -->
                <div class="footer-links-grid">
+                    <!-- Grupo de Navegación Principal -->
                     <div class="footer-group">
                          <h3 class="footer-heading">Explorar</h3>
                          <ul class="footer-list">
@@ -24,6 +25,7 @@
                               <li><router-link to="/explore">Registros</router-link></li>
                          </ul>
                     </div>
+                    <!-- Grupo de Información Legal/Corporativa -->
                     <div class="footer-group">
                          <h3 class="footer-heading">Información</h3>
                          <ul class="footer-list">
@@ -32,6 +34,7 @@
                               <li><a href="#">Licium Theme</a></li>
                          </ul>
                     </div>
+                    <!-- Grupo de Soporte y Contacto -->
                     <div class="footer-group">
                          <h3 class="footer-heading">Contacto</h3>
                          <ul class="footer-list">
@@ -41,7 +44,7 @@
                     </div>
                </div>
           </div>
-          <!-- Copyright -->
+          <!-- Barra inferior para avisos de derechos de autor y créditos -->
           <div class="footer-bottom">
                <div class="container">
                     <p>&copy; 2026 Licium Theme.</p>
@@ -49,6 +52,7 @@
           </div>
      </footer>
 </template>
+
 
 <style scoped>
 .app-footer {

@@ -1,9 +1,12 @@
 <template>
+     <!-- Tarjeta simplificada para la visualización rápida de registros -->
      <div class="record-card" v-if="record">
+          <!-- Contenedor de la miniatura del registro -->
           <div class="image-container">
                <img :src="record.thumbnail || 'https://via.placeholder.com/300x200'"
                     :alt="record.title || 'Imagen de registro'">
           </div>
+          <!-- Información básica: Título del registro -->
           <div class="info">
                <h3>{{ record.title || 'Sin título' }}</h3>
           </div>
@@ -11,8 +14,17 @@
 </template>
 
 <script setup>
+/**
+ * Componente RecordCard.
+ * 
+ * Una representación visual compacta de un registro, optimizada para
+ * ser utilizada en rejillas de resultados o secciones de recomendaciones.
+ */
+
+// Definición de las propiedades recibidas (props)
 defineProps(['record']);
 </script>
+
 
 <style lang="scss" scoped>
 @use "../assets/scss/variables" as *;

@@ -1,15 +1,15 @@
 <template>
-     <!-- Layout Principal con Diseño de Sistema -->
+     <!-- Layout base con arquitectura de diseño LICIUM -->
      <div class="app-layout">
           <header class="app-header">
                <div class="container header-inner">
-                    <!-- Logo Principal -->
+                    <!-- Marca y logotipo con enlace a la página de inicio -->
                     <router-link to="/" class="brand">
                          <h1 class="brand-text">LICIUM</h1>
                          <span class="brand-sub">THEME</span>
                     </router-link>
 
-                    <!-- Navegación Escritorio -->
+                    <!-- Navegación principal para escritorio -->
                     <nav class="app-nav" :class="{ 'nav-open': isMenuOpen }">
                          <router-link to="/" class="nav-link" active-class="active">Inicio</router-link>
                          <router-link to="/explore" class="nav-link" active-class="active">Registros</router-link>
@@ -17,11 +17,12 @@
                          <router-link to="/search" class="nav-link" active-class="active">Buscador</router-link>
                     </nav>
 
-                    <!-- Acciones del Header -->
+                    <!-- Acciones del encabezado: Selector de tema y menú móvil -->
                     <div class="header-actions">
-                         <!-- Selector de Tema -->
+                         <!-- Control para alternar entre modo claro y modo oscuro -->
                          <button class="theme-toggle" @click="toggleTheme"
                               :title="isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
+                              <!-- Icono de sol para modo claro -->
                               <svg v-if="isDark" width="20" height="20" viewBox="0 0 24 24" fill="none"
                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                    stroke-linejoin="round">
@@ -35,13 +36,14 @@
                                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
                               </svg>
+                              <!-- Icono de luna para modo oscuro -->
                               <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                               </svg>
                          </button>
 
-                         <!-- Botón Hamburguesa móvil -->
+                         <!-- Interruptor visual para el menú hamburguesa en dispositivos móviles -->
                          <button class="mobile-toggle" @click="toggleMenu" :aria-expanded="isMenuOpen">
                               <div class="hamburger" :class="{ 'is-active': isMenuOpen }">
                                    <span></span><span></span><span></span>
@@ -51,30 +53,46 @@
                </div>
           </header>
 
-          <!-- Contenido Principal -->
+          <!-- Área central de visualización de rutas dinámicas -->
           <main class="app-main">
                <router-view :key="$route.fullPath" />
           </main>
 
+          <!-- Componente de pie de página global -->
           <TheFooter />
      </div>
 </template>
 
 <script setup>
+/**
+ * Lógica principal del layout de la aplicación.
+ * 
+ * Este componente gestiona funciones transversales como el cambio de tema,
+ * la navegación móvil y la consistencia del scroll entre rutas.
+ */
+
 import { ref, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import TheFooter from './components/TheFooter.vue';
 
+// Estado reactivo para el control del menú móvil
 const isMenuOpen = ref(false);
+// Estado reactivo para la gestión visual del tema
 const isDark = ref(false);
 const route = useRoute();
 
+/**
+ * Alterna la visibilidad del menú de navegación móvil.
+ * Bloquea el scroll del cuerpo para mejorar la experiencia UX cuando el menú está abierto.
+ */
 const toggleMenu = () => {
      isMenuOpen.value = !isMenuOpen.value;
-     // Prevenir scroll en el body cuando el menú está abierto
      document.body.style.overflow = isMenuOpen.value ? 'hidden' : '';
 };
 
+/**
+ * Gestiona el cambio de tema visual y persiste la elección en el almacenamiento local.
+ */
 const toggleTheme = () => {
      isDark.value = !isDark.value;
      const theme = isDark.value ? 'dark' : 'light';
@@ -83,22 +101,24 @@ const toggleTheme = () => {
 };
 
 onMounted(() => {
+     // Inicialización de la configuración del tema visual
      const savedTheme = localStorage.getItem('licium-theme');
      if (savedTheme) {
           isDark.value = savedTheme === 'dark';
      } else {
-          // Detectar preferencia del sistema si no hay nada guardado
+          // Utiliza la preferencia del sistema operativo si no hay una elección previa guardada
           isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
      }
      document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light');
 });
 
-// Cerrar menú al cambiar de ruta
+// Resetea el estado del menú y el scroll al navegar entre diferentes rutas de la aplicación
 watch(() => route.path, () => {
      isMenuOpen.value = false;
      document.body.style.overflow = '';
 });
 </script>
+
 
 <style scoped>
 .app-layout {

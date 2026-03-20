@@ -1,19 +1,19 @@
 <template>
-     <!-- Componente de paginación reutilizable -->
+     <!-- Componente de control de paginación para la navegación entre conjuntos de datos -->
      <div class="pagination-container" v-if="totalPages > 1">
-          <!-- Botón Anterior -->
+          <!-- Botón de retroceso: Deshabilitado si el usuario se encuentra en la primera página -->
           <button class="pagination-btn" :disabled="currentPage === 1" @click="$emit('change', currentPage - 1)">
                <span class="arrow">←</span> Anterior
           </button>
 
-          <!-- Indicador de página -->
+          <!-- Indicador visual del estado actual de la paginación -->
           <div class="pagination-info">
                <span class="current-page">{{ currentPage }}</span>
                <span class="separator">/</span>
                <span class="total-pages">{{ totalPages }}</span>
           </div>
 
-          <!-- Botón Siguiente -->
+          <!-- Botón de avance: Deshabilitado al alcanzar la última página disponible -->
           <button class="pagination-btn" :disabled="currentPage === totalPages"
                @click="$emit('change', currentPage + 1)">
                Siguiente <span class="arrow">→</span>
@@ -22,19 +22,34 @@
 </template>
 
 <script setup>
+/**
+ * Componente ThePagination.
+ * 
+ * Facilita la navegación secuencial a través de múltiples páginas de resultados.
+ * Calcula automáticamente el rango total y emite eventos de cambio de página.
+ */
+
 import { computed } from 'vue';
 
 const props = defineProps({
+     // Índice de la página actualmente visualizada
      currentPage: { type: Number, required: true },
+     // Cantidad total de elementos en el conjunto de datos completo
      totalItems: { type: Number, required: true },
+     // Límite de elementos permitidos por cada página
      itemsPerPage: { type: Number, required: true }
 });
 
+// Definición del evento emitido al usuario final para solicitar un cambio de página
 defineEmits(['change']);
 
-// Calcula el número total de páginas basándose en los ítems totales
+/**
+ * Cálculo derivado del número total de páginas.
+ * Utiliza Math.ceil para asegurar que los elementos residuales tengan su propia página.
+ */
 const totalPages = computed(() => Math.ceil(props.totalItems / props.itemsPerPage));
 </script>
+
 
 <style scoped>
 .pagination-container {

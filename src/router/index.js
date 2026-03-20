@@ -7,48 +7,57 @@ import SearchView from '../views/SearchView.vue'
 import RecordsView from '../views/RecordsView.vue'
 
 /**
- * Configuración de las rutas de la aplicación.
- * Define qué componente se muestra según la URL visitada.
+ * CONFIGURACIÓN DEL ENRUTADOR DE LA APLICACIÓN
+ * 
+ * Este archivo define la arquitectura de navegación de la SPA, mapeando
+ * las rutas del navegador a los componentes de vista correspondientes
+ * y gestionando el comportamiento de desplazamiento entre transiciones.
  */
 
 const router = createRouter({
+     // Uso del historial de navegación de HTML5 para URLs limpias
      history: createWebHistory(import.meta.env.BASE_URL),
      routes: [
           {
                path: '/',
                name: 'home',
-               component: HomeView, // Página de inicio
+               component: HomeView,
           },
           {
                path: '/explore',
                name: 'explore',
-               component: RecordsView, // Catálogo completo de registros
+               component: RecordsView,
           },
           {
                path: '/record/:id',
                name: 'record-detail',
-               component: RecordDetail, // Detalle de un registro individual
+               component: RecordDetail,
           },
           {
                path: '/collections',
                name: 'collections',
-               component: CollectionsView, // Listado de todas las colecciones
+               component: CollectionsView,
           },
           {
                path: '/collections/:id',
                name: 'collection-detail',
-               component: CollectionDetail, // Detalle de una colección y sus obras
+               component: CollectionDetail,
           },
           {
                path: '/search',
                name: 'search',
-               component: SearchView, // Buscador avanzado
+               component: SearchView,
           },
      ],
-     // Comportamiento del scroll: volver siempre arriba al cambiar de página
+     /**
+      * Comportamiento del scroll al cambiar de ruta.
+      * Garantiza que el usuario comience en la parte superior de la nueva página,
+      * a menos que regrese mediante la navegación del historial (atrás/adelante).
+      */
      scrollBehavior(to, from, savedPosition) {
           return savedPosition || { top: 0 }
      }
 })
 
 export default router
+

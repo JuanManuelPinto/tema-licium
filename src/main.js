@@ -5,13 +5,17 @@ import router from './router'
 
 /**
  * Punto de entrada principal de la aplicación.
- * Configuramos Vue, añadimos el enrutador y montamos el componente principal.
+ * 
+ * Se encarga de inicializar la instancia de Vue, integrar el enrutador
+ * y montar el componente raíz (App.vue) en el elemento DOM correspondiente.
  */
 
+// Creación de la instancia de la aplicación Vue
 const app = createApp(App)
 
-// Usar el enrutador para la navegación entre páginas
+// Integración del sistema de rutas (Vue Router) para la navegación SPA
 app.use(router)
 
-// Montar la aplicación en el elemento #app del HTML
+// Renderizado de la aplicación en el contenedor HTML con id 'app'
 app.mount('#app')
+

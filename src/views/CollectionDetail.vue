@@ -1,5 +1,6 @@
 <template>
      <div class="container section-padding fade-in">
+          <!-- Barra de navegación contextual: Retorno al listado global -->
           <div class="action-bar">
                <button @click="$router.push('/collections')" class="btn-back">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -9,8 +10,10 @@
                </button>
           </div>
 
+          <!-- Estado de carga: Transición durante la recuperación de metadatos de la colección -->
           <div v-if="loadingCol" class="loading-wrapper"><span class="loader"></span> Cargando...</div>
 
+          <!-- Cabecera de la Colección: Presentación visual con imagen de fondo y descripción -->
           <div v-else-if="collection" class="collection-hero">
                <div class="hero-bg">
                     <img v-if="collection.thumbnail" :src="getThumbnail(collection.thumbnail, 'large')" />
@@ -23,20 +26,24 @@
                </div>
           </div>
 
-          <!-- Obras de la Colección -->
+          <!-- Sección de Contenidos: Listado de registros vinculados a esta colección -->
           <div class="records-section">
                <div class="section-header">
                     <h2 class="title-md">Obras en esta Colección</h2>
                     <span class="count">{{ totalItems }} resultados</span>
                </div>
 
+               <!-- Gestión de estados de carga y resultados vacíos -->
                <div v-if="loadingRec" class="loading-wrapper"><span class="loader"></span></div>
                <div v-else-if="records.length === 0" class="empty">No hay obras registradas en esta colección.</div>
+               
+               <!-- Visualización de registros mediante rejilla adaptativa -->
                <div v-else>
                     <div class="grid-auto">
                          <CommonCard v-for="record in records" :key="record.id" :item="record" type="record" />
                     </div>
 
+                    <!-- Sistema de navegación paginada para los registros de la colección -->
                     <ThePagination :current-page="currentPage" :total-items="totalItems" :items-per-page="itemsPerPage"
                          @change="onPageChange" />
                </div>
@@ -45,6 +52,15 @@
 </template>
 
 <script setup>
+/**
+ * Vista CollectionDetail.
+ * 
+ * Este componente gestiona la visualización detallada de una colección específica.
+ * Su responsabilidad incluye la recuperación de los metadatos de la propia colección
+ * y la carga dinámica de todos los registros bibliográficos o museísticos asociados
+ * a la misma, implementando un filtrado por dominio para asegurar la integridad de los datos.
+ */
+
 import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
@@ -61,21 +77,32 @@ const currentPage = ref(1);
 const totalItems = ref(0);
 const itemsPerPage = ref(20);
 
+/**
+ * Recupera la información básica y descriptiva de la colección actual.
+ */
 const fetchInfo = async () => {
      loadingCol.value = true;
      try {
           const id = route.params.id;
           const res = await axios.get(`/api/glam/collection/${id}`, { params: { fields: 'id,thumbnail,title,description' } });
           collection.value = res.data.item || res.data;
-     } catch (e) { console.error(e); }
-     finally { loadingCol.value = false; }
+     } catch (e) {
+          console.error("Error al recuperar metadatos de la colección:", e);
+     } finally {
+          loadingCol.value = false;
+     }
 };
 
+/**
+ * Recupera los registros asociados a la colección aplicando un dominio de búsqueda específico.
+ * Se utiliza una estructura de consulta compleja para filtrar por ID de colección y sitio.
+ */
 const fetchRecords = async () => {
      loadingRec.value = true;
      const offset = (currentPage.value - 1) * itemsPerPage.value;
      const id = route.params.id;
      try {
+          // Construcción del dominio de filtrado para la API GLAM
           const domain = {
                op: "and",
                children: [
@@ -88,12 +115,24 @@ const fetchRecords = async () => {
           });
           records.value = res.data.items || [];
           totalItems.value = res.data.total_items || res.data.total || 0;
-     } catch (e) { console.error(e); }
-     finally { loadingRec.value = false; }
+     } catch (e) {
+          console.error("Error al recuperar registros de la colección:", e);
+     } finally {
+          loadingRec.value = false;
+     }
 };
 
-const onPageChange = (p) => { currentPage.value = p; fetchRecords(); };
+/**
+ * Controlador para la navegación entre páginas de resultados.
+ */
+const onPageChange = (p) => {
+     currentPage.value = p;
+     fetchRecords();
+};
 
+/**
+ * Normaliza las rutas de las imágenes para solicitar versiones de alta resolución al CDN.
+ */
 const getThumbnail = (path, size = 'large') => {
      if (!path) return '';
      const domain = 'https://arcadium.cluster24.libnamic.eu';
@@ -101,9 +140,17 @@ const getThumbnail = (path, size = 'large') => {
      return full.replace(/size=\w+/, `size=${size}`);
 };
 
+/**
+ * Observa cambios en los parámetros de la ruta para permitir la navegación directa entre colecciones.
+ */
 watch(() => route.params.id, (id) => { if (id) { fetchInfo(); fetchRecords(); } });
-onMounted(() => { fetchInfo(); fetchRecords(); });
+
+onMounted(() => {
+     fetchInfo();
+     fetchRecords();
+});
 </script>
+
 
 <style scoped>
 .action-bar {

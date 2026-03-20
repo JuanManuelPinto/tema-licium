@@ -1,17 +1,20 @@
 <template>
      <div class="home-page fade-in">
-          <!-- Hero Section -->
+          <!-- Sección Hero: Impacto visual y motor de búsqueda rápido -->
           <section class="hero">
+               <!-- Fondo multimedia con tratamiento de imagen para contraste -->
                <div class="hero-media">
                     <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=928&auto=format&fit=crop"
                          alt="Patrimonio" />
                     <div class="hero-overlay"></div>
                </div>
 
+               <!-- Contenido central del Hero -->
                <div class="container hero-content">
                     <h1 class="hero-title">Ejemplo Theme <br /> <span class="highlight">LICIUM</span></h1>
                     <p class="hero-text">Tema propio de Licium.</p>
 
+                    <!-- Barra de búsqueda rápida integrada en el Hero -->
                     <div class="search-box">
                          <input v-model="searchQuery" type="text" placeholder="¿Qué deseas encontrar?"
                               @keyup.enter="onSearch" />
@@ -26,9 +29,10 @@
                </div>
           </section>
 
-          <!-- Colecciones Destacadas -->
+          <!-- Sección: Colecciones Destacadas (Mosaico Visual) -->
           <section class="section-padding">
                <div class="container">
+                    <!-- Cabecera de la sección con enlace de navegación -->
                     <div class="section-header">
                          <div class="header-titles">
                               <h2 class="title-lg">Colecciones Destacadas</h2>
@@ -37,6 +41,7 @@
                          <router-link to="/collections" class="btn-outline">Ver todas</router-link>
                     </div>
 
+                    <!-- Visualización condicional: Estado de carga o rejilla de contenidos -->
                     <div v-if="loading" class="loading-wrapper"><span class="loader"></span></div>
                     <div v-else class="tiles-grid">
                          <router-link v-for="col in collections" :key="col.id"
@@ -53,7 +58,7 @@
                </div>
           </section>
 
-          <!-- Banner CTA Intermedio -->
+          <!-- Banner de Llamada a la Acción (CTA): Acceso al buscador detallado -->
           <section class="cta-banner">
                <div class="container cta-inner">
                     <div class="cta-text">
@@ -64,7 +69,7 @@
                </div>
           </section>
 
-          <!-- Novedades (Mismo estilo que colecciones) -->
+          <!-- Sección: Novedades / Últimos Registros añadidos -->
           <section class="section-padding">
                <div class="container">
                     <div class="section-header">
@@ -95,6 +100,14 @@
 </template>
 
 <script setup>
+/**
+ * Vista HomeView.
+ * 
+ * Es la página de aterrizaje de la aplicación. Su función es proporcionar una
+ * visión panorámica del contenido (registros y colecciones) y actuar como
+ * portal de entrada mediante una búsqueda rápida y enlaces destacados.
+ */
+
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
@@ -105,12 +118,20 @@ const collections = ref([]);
 const records = ref([]);
 const loading = ref(true);
 
+/**
+ * Redirige al usuario a la vista de búsqueda avanzada pasando la consulta
+ * introducida en el input del Hero.
+ */
 const onSearch = () => {
      if (searchQuery.value.trim()) {
           router.push({ name: 'search', query: { q: searchQuery.value } });
      }
 };
 
+/**
+ * Normaliza las URLs de las miniaturas para solicitar versiones de alta resolución
+ * adecuadas para el diseño de mosaicos grandes de la Home.
+ */
 const getLargeThumb = (path) => {
      if (!path) return '';
      const domain = 'https://arcadium.cluster24.libnamic.eu';
@@ -118,14 +139,22 @@ const getLargeThumb = (path) => {
      return full.replace(/size=\w+/, 'size=large');
 };
 
+/**
+ * Utilidad para truncar textos largos de descripciones para mantener
+ * la consistencia en el diseño de las tarjetas.
+ */
 const truncate = (str, len) => {
      if (!str) return '';
      return str.length > len ? str.substring(0, len) + '...' : str;
 };
 
+/**
+ * Inicialización de datos para la página de inicio.
+ * Realiza peticiones concurrentes para obtener muestras de colecciones y registros.
+ */
 const init = async () => {
      try {
-          // Cargamos 4 colecciones y 4 registros para mantener la simetría
+          // Solicitud paralela para optimizar el tiempo de carga inicial
           const [resCol, resRec] = await Promise.all([
                axios.get('/api/glam/collection', { params: { limit: 4, fields: 'id,thumbnail,title,description' } }),
                axios.get('/api/glam/record', { params: { limit: 4, fields: 'id,thumbnail,title,author,description' } })
@@ -133,7 +162,7 @@ const init = async () => {
           collections.value = resCol.data.items || [];
           records.value = resRec.data.items || [];
      } catch (e) {
-          console.error("Home Error:", e);
+          console.error("Error al inicializar HomeView:", e);
      } finally {
           loading.value = false;
      }
@@ -141,6 +170,7 @@ const init = async () => {
 
 onMounted(init);
 </script>
+
 
 <style scoped>
 /* Hero */

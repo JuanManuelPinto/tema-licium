@@ -1,10 +1,12 @@
 <template>
      <div class="container section-padding fade-in">
+          <!-- Encabezado de la página: Título jerárquico y contextualización -->
           <header class="page-header">
                <h1 class="page-title">Listado de <span class="highlight">Colecciones</span></h1>
                <p class="page-subtitle">Explora todas las colecciones disponibles.</p>
           </header>
 
+          <!-- Barra de herramientas: Selectores de visualización y estadísticas de resultados -->
           <div class="toolbar" v-if="!loading">
                <div class="view-options">
                     <button v-for="mode in ['grid', 'list', 'magazine']" :key="mode" @click="viewMode = mode"
@@ -15,13 +17,16 @@
                <div class="stats">{{ totalItems }} Colecciones encontradas</div>
           </div>
 
+          <!-- Área de contenido dinámico: Estados de carga, rejilla de datos y navegación -->
           <div v-if="loading" class="loading-wrapper"><span class="loader"></span></div>
           <div v-else>
                <div :class="['grid-layout', `view-${viewMode}`]">
+                    <!-- Renderizado iterativo de tarjetas de colección -->
                     <CommonCard v-for="(col, idx) in collections" :key="col.id" :item="col" type="collection"
                          :view-mode="viewMode" :reverse="idx % 2 !== 0" />
                </div>
 
+               <!-- Componente de navegación paginada -->
                <ThePagination :current-page="currentPage" :total-items="totalItems" :items-per-page="itemsPerPage"
                     @change="onPageChange" />
           </div>
@@ -29,6 +34,14 @@
 </template>
 
 <script setup>
+/**
+ * Vista CollectionsView.
+ * 
+ * Gestiona el catálogo de colecciones de la aplicación. Implementa lógica de
+ * paginación, sincronización de estado con la URL (querystrings) y permite
+ * alternar entre múltiples modos de visualización para mejorar la experiencia de exploración.
+ */
+
 import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
@@ -38,6 +51,7 @@ import ThePagination from '../components/ThePagination.vue';
 const route = useRoute();
 const router = useRouter();
 
+// Estado reactivo de la vista
 const collections = ref([]);
 const loading = ref(true);
 const viewMode = ref('grid');
@@ -45,19 +59,29 @@ const currentPage = ref(1);
 const totalItems = ref(0);
 const itemsPerPage = ref(12);
 
+// Modos de visualización soportados por el sistema de diseño
 const allowedViewModes = new Set(['grid', 'list', 'magazine']);
 const isSyncingFromRoute = ref(false);
 
+/**
+ * Normaliza y valida el número de página proveniente de la URL.
+ */
 const parsePage = (p) => {
      const n = Number.parseInt(String(p ?? ''), 10);
      return Number.isFinite(n) && n > 0 ? n : 1;
 };
 
+/**
+ * Valida que el modo de visualización solicitado sea uno de los permitidos.
+ */
 const parseView = (v) => {
      const s = String(v ?? '');
      return allowedViewModes.has(s) ? s : 'grid';
 };
 
+/**
+ * Lee los parámetros de la URL para inicializar el estado del componente.
+ */
 const syncStateFromRoute = () => {
      isSyncingFromRoute.value = true;
      viewMode.value = parseView(route.query.view);
@@ -65,6 +89,9 @@ const syncStateFromRoute = () => {
      isSyncingFromRoute.value = false;
 };
 
+/**
+ * Actualiza la URL para reflejar el estado actual (navegabilidad compartible).
+ */
 const pushStateToRoute = async () => {
      if (isSyncingFromRoute.value) return;
      const nextQuery = {
@@ -73,11 +100,15 @@ const pushStateToRoute = async () => {
           page: String(currentPage.value),
      };
 
+     // Evita redirecciones redundantes si el estado no ha cambiado realmente
      if (route.query.view === nextQuery.view && String(route.query.page ?? '') === nextQuery.page) return;
 
      await router.push({ query: nextQuery });
 };
 
+/**
+ * Realiza la petición asíncrona al servidor para obtener el bloque de datos actual.
+ */
 const fetchCollections = async () => {
      loading.value = true;
      const offset = (currentPage.value - 1) * itemsPerPage.value;
@@ -88,13 +119,17 @@ const fetchCollections = async () => {
           collections.value = res.data.items || [];
           totalItems.value = res.data.total_items || res.data.total || 0;
      } catch (e) {
-          console.error(e);
+          console.error("Error al recuperar colecciones:", e);
      } finally {
           loading.value = false;
+          // Garantiza el posicionamiento superior tras la carga de nuevos datos
           window.scrollTo({ top: 0, behavior: 'smooth' });
      }
 };
 
+/**
+ * Manejador del evento de cambio de página emitido por el componente ThePagination.
+ */
 const onPageChange = (p) => {
      currentPage.value = p;
 };
@@ -104,6 +139,7 @@ onMounted(() => {
      fetchCollections();
 });
 
+// Vigilancia de cambios en la URL para permitir navegación con botones atrás/adelante del navegador
 watch(
      () => [route.query.page, route.query.view],
      () => {
@@ -116,14 +152,17 @@ watch(
      }
 );
 
+// Sincronización bidireccional entre el estado reactivo y la URL
 watch(viewMode, () => {
      pushStateToRoute();
 });
+
 watch(currentPage, () => {
      pushStateToRoute();
      fetchCollections();
 });
 </script>
+
 
 <style scoped>
 .page-header {

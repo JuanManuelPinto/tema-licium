@@ -1,19 +1,19 @@
 <template>
-     <!-- Tarjeta Reutilizable con Sistema de Diseño -->
+     <!-- Tarjeta versátil diseñada para mostrar tanto registros individuales como colecciones -->
      <router-link :to="link" :class="['card-item', `view-${viewMode}`, { 'is-reverse': reverse }]">
 
-          <!-- Imagen / Miniatura -->
+          <!-- Contenedor de medios: gestión de miniaturas y estados vacíos -->
           <div class="card-media">
                <img v-if="item.thumbnail" :src="thumbUrl" :alt="item.title" class="card-img" loading="lazy" />
                <div v-else class="card-no-img">
                     <span>{{ typeLabel }}</span>
                </div>
 
-               <!-- Badge flotante -->
+               <!-- Etiqueta flotante que indica la tipografía del elemento -->
                <div class="card-badge">{{ typeLabel }}</div>
           </div>
 
-          <!-- Contenido -->
+          <!-- Bloque de información: título, descripción condensada y llamada a la acción -->
           <div class="card-body">
                <h3 class="card-title">{{ item.title || 'Sin Título' }}</h3>
                <p class="card-text" v-if="shouldShowDesc">{{ cleanDesc }}</p>
@@ -26,39 +26,64 @@
 </template>
 
 <script setup>
+/**
+ * Componente CommonCard.
+ * 
+ * Es el bloque de construcción fundamental para los listados. Permite tres modos
+ * de visualización (Grid, List, Magazine) y se adapta dinámicamente al tipo
+ * de contenido (Registro o Colección).
+ */
+
 import { computed } from 'vue';
 
 const props = defineProps({
+     // Datos crudos del elemento (API response)
      item: { type: Object, required: true },
+     // Categoría del elemento: 'record' o 'collection'
      type: { type: String, default: 'record' },
+     // Estrategia visual: 'grid' (mosaico), 'list' (fila simple) o 'magazine' (diseño editorial)
      viewMode: { type: String, default: 'grid' },
+     // Invierte el orden de imagen/texto en el modo 'magazine'
      reverse: { type: Boolean, default: false }
 });
 
+// Genera la ruta de destino según el tipo de objeto
 const link = computed(() => ({
      name: props.type === 'collection' ? 'collection-detail' : 'record-detail',
      params: { id: props.item.id }
 }));
 
+// Texto descriptivo del tipo de contenido
 const typeLabel = computed(() => props.type === 'collection' ? 'Colección' : 'Registro');
+
+// Determina si se debe renderizar la descripción (se oculta en vista Grid por espacio)
 const shouldShowDesc = computed(() => props.viewMode !== 'grid');
 
+/**
+ * Limpia el contenido HTML de la descripción y trunca el texto
+ * para mantener la consistencia visual en los listados.
+ */
 const cleanDesc = computed(() => {
      let d = props.item.description || '';
      return d.replace(/<[^>]*>?/gm, '').substring(0, 150) + (d.length > 150 ? '...' : '');
 });
 
+/**
+ * Resuelve la URL de la imagen y aplica lógica de optimización de tamaño
+ * basada en el contexto de visualización actual.
+ */
 const thumbUrl = computed(() => {
      if (!props.item.thumbnail) return '';
      const domain = 'https://arcadium.cluster24.libnamic.eu';
      let path = props.item.thumbnail;
      let full = path.startsWith('http') ? path : `${domain}${path}`;
 
-     // Optimización de tamaño según modo
+     // Ajuste de calidad y tamaño según el modo visual
      if (props.viewMode === 'magazine') return full.replace(/size=\w+/, 'size=large');
      return full.replace(/size=\w+/, 'size=medium');
 });
 </script>
+
 
 <style scoped>
 .card-item {
@@ -152,11 +177,17 @@ const thumbUrl = computed(() => {
 .view-list {
      flex-direction: row;
      height: auto;
+     min-height: 220px;
 }
 
 .view-list .card-media {
-     width: 300px;
+     width: 320px;
+     min-width: 320px;
+     flex-shrink: 0;
      aspect-ratio: auto;
+     display: flex;
+     align-items: center;
+     justify-content: center;
 }
 
 .view-list .card-body {

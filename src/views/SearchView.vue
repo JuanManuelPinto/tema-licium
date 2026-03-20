@@ -1,13 +1,14 @@
 <template>
      <div class="container section-padding fade-in">
+          <!-- Cabecera de la vista de búsqueda: Contextualización para el usuario -->
           <header class="page-header">
                <h1 class="page-title">Buscador <span class="highlight">Avanzado</span></h1>
-               <p class="page-subtitle">Utiliza filtros avanzados por campos de ontología y colecciones para encontrar
-                    registros específicos.</p>
+               <p class="page-subtitle">Utiliza filtros especializados por campos de ontología y colecciones para localizar
+                    registros de manera precisa.</p>
           </header>
 
           <div class="search-layout">
-               <!-- Botón para mostrar filtros en móvil -->
+               <!-- Dispositivo de control para visualización de filtros en interfaces móviles -->
                <button class="filters-toggle-btn" @click="showMobileFilters = !showMobileFilters">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                          <path d="M22 3H2l8 9v6l4 3v-9L22 3z" />
@@ -15,11 +16,12 @@
                     {{ showMobileFilters ? 'Ocultar Filtros' : 'Refinar Búsqueda' }}
                </button>
 
-               <!-- Panel de Filtros (Izquierda) -->
+               <!-- Panel Lateral de Filtros: Motor de configuración de la consulta -->
                <aside class="filters-panel" :class="{ 'is-visible': showMobileFilters }">
+                    <!-- Ámbito de búsqueda: Definición de la entidad objetivo -->
                     <div class="filter-group">
                          <div class="group-header">
-                              <h3 class="filter-label">¿Qué buscas?</h3>
+                              <h3 class="filter-label">¿Qué deseas buscar?</h3>
                               <button class="btn-reset-all" @click="resetAllFilters" title="Limpiar todos los filtros">
                                    Limpiar todo
                               </button>
@@ -32,6 +34,7 @@
                          </div>
                     </div>
 
+                    <!-- Motor de búsqueda rápida: Filtrado por términos generales -->
                     <div class="filter-group">
                          <div class="group-header">
                               <h3 class="filter-label">Búsqueda rápida</h3>
@@ -46,9 +49,10 @@
                                    <path d="m21 21-4.35-4.35" />
                               </svg>
                          </div>
-                         <p class="field-hint">Busca coincidencias en el título o el autor de los registros.</p>
+                         <p class="field-hint">Búsqueda transversal por coincidencias fonéticas en títulos y autorías.</p>
                     </div>
 
+                    <!-- Constructor de Reglas: Definición lógica de filtros específicos de campo -->
                     <div class="filter-group">
                          <div class="group-header">
                               <h3 class="filter-label">Filtros específicos</h3>
@@ -56,35 +60,36 @@
                                    <span class="logic-label">Lógica:</span>
                                    <div class="logic-btns">
                                         <button @click="form.combine = 'Y'" :class="{ active: form.combine === 'Y' }"
-                                             title="Todos los filtros deben cumplirse (AND)">Y</button>
+                                             title="Intersección estricta (AND)">Y</button>
                                         <button @click="form.combine = 'O'" :class="{ active: form.combine === 'O' }"
-                                             title="Al menos un filtro debe cumplirse (OR)">O</button>
+                                             title="Unión flexible (OR)">O</button>
                                    </div>
                               </div>
                          </div>
                          <div class="rules-list">
                               <div v-for="(rule, idx) in form.rules" :key="idx" class="rule-box">
-                                   <select v-model="rule.field">
+                                   <select v-model="rule.field" aria-label="Campo de búsqueda">
                                         <option v-for="field in availableFields" :key="field.value"
                                              :value="field.value">
                                              {{ field.label }}
                                         </option>
                                    </select>
-                                   <input type="text" v-model="rule.value" placeholder="Valor a buscar..."
+                                   <input type="text" v-model="rule.value" placeholder="Término de búsqueda..."
                                         @keyup.enter="handleNewSearch" />
                                    <button class="btn-remove" @click="removeRule(idx)" v-if="form.rules.length > 1"
-                                        title="Eliminar filtro">×</button>
+                                        title="Eliminar regla">×</button>
                               </div>
-                              <button class="btn-link" @click="addRule">+ Añadir otro campo</button>
+                              <button class="btn-link" @click="addRule">+ Añadir parámetro adicional</button>
                          </div>
                          <div class="logic-explanation">
-                              <small v-if="form.combine === 'Y'"><strong>Modo Y (AND):</strong> Los resultados deben
-                                   contener todos los valores indicados arriba.</small>
-                              <small v-else><strong>Modo O (OR):</strong> Los resultados pueden contener cualquiera de
-                                   los valores indicados arriba.</small>
+                              <small v-if="form.combine === 'Y'"><strong>Intersección (AND):</strong> Se requiere el
+                                   cumplimiento de todos los criterios simultáneamente.</small>
+                              <small v-else><strong>Unión (OR):</strong> Se recuperarán registros que cumplan al menos
+                                   uno de los criterios indicados.</small>
                          </div>
                     </div>
 
+                    <!-- Selector de Colección: Filtrado por contexto arqueológico o museístico -->
                     <div class="filter-group">
                          <div class="group-header">
                               <h3 class="filter-label">Colección específica</h3>
@@ -95,17 +100,20 @@
                               <option v-for="col in collectionsList" :key="col.id" :value="col.id">{{ col.title }}
                               </option>
                          </select>
-                         <p v-if="form.scope !== 'registros'" class="field-hint">Solo disponible para búsqueda de registros.</p>
+                         <p v-if="form.scope !== 'registros'" class="field-hint">Filtro exclusivo para búsquedas de registros bibliográficos.</p>
                     </div>
 
                     <button class="btn-primary w-full" @click="handleNewSearch" :disabled="loading">
-                         {{ loading ? 'Buscando...' : 'Aplicar Filtros' }}
+                         {{ loading ? 'Procesando...' : 'Ejecutar Búsqueda' }}
                     </button>
                </aside>
 
-               <!-- Resultados (Derecha) -->
+               <!-- Visualizador de Resultados: Área principal de despliegue de información -->
                <section class="results-viewer">
-                    <div v-if="loading" class="loading-wrapper"><span class="loader"></span> Buscando...</div>
+                    <!-- Retroalimentación de carga -->
+                    <div v-if="loading" class="loading-wrapper"><span class="loader"></span> Sincronizando resultados...</div>
+                    
+                    <!-- Estado inicial: Invitación a la interacción -->
                     <div v-else-if="!hasSearched" class="initial-state">
                          <div class="placeholder-content">
                               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--border-color)"
@@ -113,11 +121,13 @@
                                    <circle cx="11" cy="11" r="8" />
                                    <path d="m21 21-4.35-4.35" />
                               </svg>
-                              <h3>Listo para buscar</h3>
-                              <p>Configura los filtros y haz clic en aplicar para empezar.</p>
+                              <h3>Sistema de Búsqueda</h3>
+                              <p>Configura los parámetros laterales y activa los filtros para iniciar la consulta.</p>
                          </div>
                     </div>
+
                     <div v-else>
+                         <!-- Estadísticas y herramientas de visualización de resultados -->
                          <div class="results-header">
                               <div class="results-stats">
                                    <h2 class="title-sm">Resultados ({{ totalItems }})</h2>
@@ -132,7 +142,7 @@
                                              {{ mode }}
                                         </button>
                                    </div>
-                                   <button @click="handleNewSearch" class="btn-refresh" title="Actualizar resultados">
+                                   <button @click="handleNewSearch" class="btn-refresh" title="Sincronizar resultados">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                              stroke="currentColor" stroke-width="2">
                                              <path d="M21 2v6h-6" />
@@ -144,20 +154,24 @@
                               </div>
                          </div>
 
+                         <!-- Caso: No se encontraron registros -->
                          <div v-if="records.length === 0" class="no-data">
-                              No hay coincidencias para estos filtros en esta página.
-                              <button @click="currentPage = 1; executeSearch()" class="btn-link">Volver al
-                                   inicio</button>
+                              No se han localizado registros que satisfagan la combinación de filtros actual.
+                              <button @click="currentPage = 1; executeSearch()" class="btn-link">Reiniciar paginación</button>
                          </div>
+
+                         <!-- Renderizado de la rejilla de resultados -->
                          <div v-else>
                               <div :class="['grid-layout', `view-${viewMode}`]">
                                    <CommonCard v-for="(record, idx) in records" :key="record.id" :item="record"
                                         :type="record._type" :view-mode="viewMode" :reverse="idx % 2 !== 0" />
                               </div>
+                              
+                              <!-- Sistema de paginación global -->
                               <div class="pagination-wrapper">
                                    <ThePagination :current-page="currentPage" :total-items="totalItems"
                                         :items-per-page="itemsPerPage" @change="handlePageChange" />
-                                   <p class="pagination-hint">Mostrando {{ records.length }} resultados en esta página.
+                                   <p class="pagination-hint">Mostrando {{ records.length }} resultados en el lote actual.
                                    </p>
                               </div>
                          </div>
@@ -168,6 +182,16 @@
 </template>
 
 <script setup>
+/**
+ * Vista SearchView.
+ * 
+ * Este componente es el núcleo de búsqueda de la aplicación. Gestiona un sistema
+ * complejo de filtros avanzado, permitiendo consultas granulares sobre campos
+ * técnicos (metadatos), filtrado taxonómico por colecciones y soporte para
+ * lógica booleana básica (AND/OR). Implementa una arquitectura reactiva que
+ * sincroniza las reglas visuales con el motor de consultas de la API GLAM.
+ */
+
 import { reactive, ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
@@ -176,6 +200,8 @@ import ThePagination from '../components/ThePagination.vue';
 
 const route = useRoute();
 const showMobileFilters = ref(false);
+
+// Esquema de campos disponibles para el filtrado especializado
 const availableFields = [
      { value: 'title', label: 'Título' },
      { value: 'author', label: 'Autor / Creador' },
@@ -198,12 +224,14 @@ const availableFields = [
      { value: 'audience', label: 'Audiencia' }
 ];
 
+// Opciones de alcance para la consulta
 const scopeOptions = [
      { val: 'registros', label: 'Registros' },
      { val: 'colecciones', label: 'Colecciones' },
      { val: 'todo', label: 'Todo' }
 ];
 
+// Estado integral del formulario de búsqueda
 const form = reactive({
      scope: 'registros',
      query: '',
@@ -212,11 +240,9 @@ const form = reactive({
      collection: ''
 });
 
-// Resetear colección si el ámbito no es registros
+// Sincronización de reglas de negocio: La colección solo aplica a registros
 watch(() => form.scope, (newScope) => {
-     if (newScope !== 'registros') {
-          form.collection = '';
-     }
+     if (newScope !== 'registros') form.collection = '';
 });
 
 const loading = ref(false);
@@ -229,11 +255,15 @@ const currentPage = ref(1);
 const itemsPerPage = ref(24);
 
 onMounted(async () => {
+     // Precarga de la lista de colecciones para alimentar los selectores de filtrado
      try {
           const res = await axios.get('/api/glam/collection', { params: { fields: 'id,title', limit: 100 } });
           collectionsList.value = res.data.items || [];
-     } catch (e) { console.error(e); }
+     } catch (e) {
+          console.error("Error al precargar colecciones:", e);
+     }
 
+     // Integración con parámetros de entrada desde el Hero de la Home
      if (route.query.q) {
           form.query = route.query.q;
           form.scope = 'todo';
@@ -241,6 +271,9 @@ onMounted(async () => {
      }
 });
 
+/**
+ * Restaura el estado original del motor de búsqueda.
+ */
 const resetAllFilters = () => {
      form.scope = 'registros';
      form.query = '';
@@ -250,23 +283,50 @@ const resetAllFilters = () => {
      handleNewSearch();
 };
 
+/**
+ * Añade una nueva fila de regla lógica al constructor de filtros.
+ */
 const addRule = () => form.rules.push({ field: 'title', operator: 'contains', value: '' });
-const removeRule = (idx) => form.rules.splice(idx, 1);
-const handleNewSearch = () => { currentPage.value = 1; executeSearch(); };
-const handlePageChange = (p) => { currentPage.value = p; executeSearch(); };
 
+/**
+ * Elimina una regla lógica específica.
+ */
+const removeRule = (idx) => form.rules.splice(idx, 1);
+
+/**
+ * Inicia una nueva búsqueda reseteando la paginación.
+ */
+const handleNewSearch = () => {
+     currentPage.value = 1;
+     executeSearch();
+};
+
+/**
+ * Gestiona el cambio de lote de datos ante eventos de paginación.
+ */
+const handlePageChange = (p) => {
+     currentPage.value = p;
+     executeSearch();
+};
+
+/**
+ * Motor de ejecución de la consulta.
+ * Construye dinámicamente el árbol léxico de condiciones requerido por la API GLAM.
+ */
 const executeSearch = async () => {
      loading.value = true;
      hasSearched.value = true;
      const offset = (currentPage.value - 1) * itemsPerPage.value;
 
      try {
+          // Bloque fundamental: Filtrado por sitio activo
           const conditions = [{ type: "condition", field: "sites", operator: "in", value: [8] }];
+          
           if (form.collection) {
                conditions.push({ type: "condition", field: "collections", operator: "in", value: [parseInt(form.collection)] });
           }
 
-          // Búsqueda rápida: buscamos en título o autor por defecto (según petición del usuario)
+          // Inyección de búsqueda rápida multi-campo
           if (form.query) {
                conditions.push({
                     op: 'or',
@@ -277,7 +337,7 @@ const executeSearch = async () => {
                });
           }
 
-          // Lógica de Reglas de Filtro por Campo
+          // Procesamiento de reglas avanzadas por campo
           const ruleSet = form.rules.filter(r => r.value).map(r => ({
                type: "condition",
                field: r.field,
@@ -286,7 +346,7 @@ const executeSearch = async () => {
           }));
 
           if (ruleSet.length > 0) {
-               // Aplicamos el combinador (Y / O) elegido por el usuario para estas reglas
+               // Aplicación de la lógica booleana del combinador (Y/O)
                conditions.push({ op: form.combine === 'Y' ? 'and' : 'or', children: ruleSet });
           }
 
@@ -299,30 +359,27 @@ const executeSearch = async () => {
           let results = [];
           let total = 0;
 
+          // Bifurcación de lógica según el ámbito (Scope) seleccionado
           if (form.scope === 'todo') {
-               // En modo "todo", repartimos el límite para obtener una muestra de ambos
+               // Estrategia de muestreo combinado para búsqueda universal
                const halfLimit = Math.floor(itemsPerPage.value / 2);
 
-               // Registros
-               const resReg = await axios.get('/api/glam/record', {
-                    params: { ...params, limit: halfLimit, fields: 'thumbnail,title,author,id' }
-               });
-               const regItems = (resReg.data.items || []).map(i => ({ ...i, _type: 'record' }));
-               const regTotal = resReg.data.total_items || resReg.data.total || 0;
+               const [resReg, resCol] = await Promise.all([
+                    axios.get('/api/glam/record', { params: { ...params, limit: halfLimit, fields: 'thumbnail,title,author,id' } }),
+                    axios.get('/api/glam/collection', { params: { ...params, limit: itemsPerPage.value - halfLimit, fields: 'id,thumbnail,title' } })
+               ]);
 
-               // Colecciones
-               const resCol = await axios.get('/api/glam/collection', {
-                    params: { ...params, limit: itemsPerPage.value - regItems.length, fields: 'id,thumbnail,title' }
-               });
+               const regItems = (resReg.data.items || []).map(i => ({ ...i, _type: 'record' }));
                const colItems = (resCol.data.items || []).map(i => ({ ...i, _type: 'collection' }));
-               const colTotal = resCol.data.total_items || resCol.data.total || 0;
 
                results = [...regItems, ...colItems];
-               total = regTotal + colTotal;
+               total = (resReg.data.total_items || 0) + (resCol.data.total_items || 0);
+
           } else if (form.scope === 'registros') {
                const resReg = await axios.get('/api/glam/record', { params: { ...params, fields: 'thumbnail,title,author,id' } });
                results = (resReg.data.items || []).map(i => ({ ...i, _type: 'record' }));
                total = resReg.data.total_items || resReg.data.total || 0;
+
           } else if (form.scope === 'colecciones') {
                const resCol = await axios.get('/api/glam/collection', { params: { ...params, fields: 'id,thumbnail,title' } });
                results = (resCol.data.items || []).map(i => ({ ...i, _type: 'collection' }));
@@ -331,21 +388,22 @@ const executeSearch = async () => {
 
           records.value = results;
           totalItems.value = total;
+
      } catch (e) {
-          console.error(e);
+          console.error("Fallo crítico en el motor de búsqueda avanzada:", e);
      } finally {
           loading.value = false;
-          // Si estamos en escritorio, hacemos scroll al inicio de los resultados
+          // Optimización de UX: Asegurar visibilidad de los nuevos resultados
           if (window.innerWidth >= 1024) {
                window.scrollTo({ top: 0, behavior: 'smooth' });
           } else {
-               // En móvil, subimos al principio del visor de resultados
                const resultsEl = document.querySelector('.results-viewer');
                if (resultsEl) resultsEl.scrollIntoView({ behavior: 'smooth' });
           }
      }
 };
 </script>
+
 
 <style scoped>
 .page-header {

@@ -1,34 +1,38 @@
-/* 
-  SISTEMA DE DISEÑO GLOBAL - LICIUM THEME 
-  Este archivo contiene todas las variables, resets y estilos base del proyecto.
-*/
+/**
+ * SISTEMA DE DISEÑO GLOBAL - LICIUM THEME
+ * 
+ * Este archivo centraliza la identidad visual del proyecto, definiendo la paleta
+ * cromática, la escala tipográfica fluida, el sistema de espaciado y los estilos
+ * base que garantizan la coherencia estética en toda la aplicación.
+ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap');
 
 :root {
-     /* --- PALETA DE COLORES --- */
+     /* --- PALETA CROMÁTICA --- */
+     /* El dorado #d4af37 es el color de marca principal para acentos y elementos de énfasis */
      --primary-color: #d4af37;
-     /* Dorado Licium */
      --primary-hover: #b5952f;
      --accent-color: #d4af37;
 
-     /* Colores de fondo y superficie */
+     /* Definición de superficies y fondos para el modo claro */
      --bg-color: #f8f9fa;
      --surface-color: #ffffff;
      --surface-card: #ffffff;
      --border-color: rgba(0, 0, 0, 0.08);
 
-     /* Colores de texto */
+     /* Jerarquía de color para textos */
      --text-primary: #1a1a1a;
      --text-secondary: #4a4a4a;
      --text-muted: #888888;
      --text-on-accent: #ffffff;
 
-     /* --- TIPOGRAFÍA --- */
+     /* --- SISTEMA TIPOGRÁFICO --- */
+     /* Inter para legibilidad en bloques de texto y Playfair para encabezados elegantes */
      --font-body: 'Inter', system-ui, -apple-system, sans-serif;
      --font-heading: 'Playfair Display', serif;
 
-     /* Tamaños de fuente fluidos */
+     /* Escala de fuentes fluida (clamp) que se adapta al ancho de la pantalla */
      --fs-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.75rem);
      --fs-sm: clamp(0.8rem, 0.75rem + 0.3vw, 0.875rem);
      --fs-base: clamp(0.95rem, 0.9rem + 0.2vw, 1rem);
@@ -39,7 +43,7 @@
      --fs-4xl: clamp(2.2rem, 1.8rem + 2vw, 3.5rem);
      --fs-hero: clamp(2.8rem, 8vw, 5rem);
 
-     /* --- ESPACIADO Y DISEÑO --- */
+     /* --- ARQUITECTURA DE DISEÑO Y LAYOUT --- */
      --spacing-xs: 0.25rem;
      --spacing-sm: 0.5rem;
      --spacing-md: 1rem;
@@ -51,7 +55,7 @@
      --container-max: 1400px;
      --header-height: 80px;
 
-     /* --- BORDES Y SOMBRAS --- */
+     /* BORDES Y SOMBRAS PROGRESIVAS */
      --radius-sm: 4px;
      --radius-md: 8px;
      --radius-lg: 16px;
@@ -61,13 +65,16 @@
      --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.08);
      --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.12);
 
-     /* --- ANIMACIONES --- */
+     /* DINÁMICA DE TRANSICIONES */
      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
      --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
      --transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* MODO OSCURO MANUAL */
+/**
+ * CONFIGURACIÓN DE MODO OSCURO
+ * Sobrescribe las variables de color cuando el atributo data-theme es 'dark'
+ */
 [data-theme="dark"] {
      --bg-color: #0f1115;
      --surface-color: #16181d;
@@ -81,7 +88,7 @@
      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
-/* RESET Y BASE */
+/* RESET ESTRUCTURAL */
 * {
      box-sizing: border-box;
      margin: 0;
@@ -97,7 +104,7 @@ body {
      overflow-x: hidden;
 }
 
-/* TIPOGRAFÍA GLOBAL */
+/* JERARQUÍA TIPOGRÁFICA */
 h1,
 h2,
 h3,
@@ -114,7 +121,7 @@ p {
      margin-bottom: 1.5rem;
 }
 
-/* ENLACES Y BOTONES BASE */
+/* TRATAMIENTO DE ENLACES Y ACCIONES */
 a {
      color: inherit;
      text-decoration: none;
@@ -129,11 +136,10 @@ button {
      cursor: pointer;
 }
 
-/* UTILIDADES DE DISEÑO */
+/* UTILIDADES DE CONTENCIÓN Y LAYOUT */
 .container {
      max-width: var(--container-max);
      margin: 0 auto;
-     /* 1.5rem (24px) base para móvil para un look limpio y equilibrado */
      padding: 0 1.5rem;
      width: 100%;
 }
@@ -156,12 +162,7 @@ button {
      }
 }
 
-@media (min-width: 1200px) {
-     .container {
-          padding: 0 3rem;
-     }
-}
-
+/* Espaciado estándar para secciones del contenido principal */
 .section-padding {
      padding: var(--spacing-3xl) 0;
 }
@@ -172,9 +173,9 @@ button {
      }
 }
 
-/* COMPONENTES GLOBALES PARA TODA LA APP */
+/* COMPONENTES DE INTERFAZ REUTILIZABLES */
 
-/* Botón Principal Estilizado */
+/* Estilo para acciones principales con énfasis visual */
 .btn-primary {
      background-color: var(--primary-color);
      color: var(--text-on-accent);
@@ -198,7 +199,7 @@ button {
      box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
 }
 
-/* Badges y Etiquetas */
+/* Etiquetas visuales para categorización */
 .badge {
      padding: 0.25rem 0.75rem;
      border-radius: var(--radius-sm);
@@ -209,7 +210,7 @@ button {
      color: var(--primary-color);
 }
 
-/* Loader Universal */
+/* Estados de carga (Spinners) */
 .loading-wrapper {
      display: flex;
      flex-direction: column;
@@ -240,7 +241,7 @@ button {
      }
 }
 
-/* Animación de entrada por defecto */
+/* Transición de aparición suave para elementos del DOM */
 .fade-in {
      animation: fadeIn var(--transition-slow) forwards;
 }
@@ -257,7 +258,7 @@ button {
      }
 }
 
-/* GRID DEL SISTEMA */
+/* GRID ADAPTATIVO */
 .grid-auto {
      display: grid;
      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -270,9 +271,9 @@ button {
      }
 }
 
-/* ─── COMPONENTES COMPARTIDOS ENTRE VISTAS ─── */
+/* ELEMENTOS COMPARTIDOS ENTRE VISTAS */
 
-/* Cabecera de página (usada en Records, Collections, Search) */
+/* Encabezado estandarizado para páginas de búsqueda y listado */
 .page-header {
      text-align: center;
      margin-bottom: 4rem;
@@ -286,7 +287,6 @@ button {
 @media (max-width: 768px) {
      .page-title {
           font-size: var(--fs-2xl);
-          /* Elegancia sutil tipo RecordDetail */
      }
 }
 
@@ -302,13 +302,7 @@ button {
      margin: 0 auto;
 }
 
-@media (max-width: 768px) {
-     .page-header {
-          margin-bottom: 2.5rem;
-     }
-}
-
-/* Barra de herramientas (toolbar) */
+/* Barra de herramientas para filtrado y ordenación */
 .toolbar {
      display: flex;
      justify-content: space-between;
@@ -330,7 +324,7 @@ button {
      }
 }
 
-/* Selector de vista (Grid / List / Magazine) */
+/* Controles de cambio de visualización (Grid/List) */
 .view-options {
      display: flex;
      gap: 0.5rem;
@@ -359,14 +353,7 @@ button {
      color: var(--primary-color);
 }
 
-@media (max-width: 768px) {
-     .view-options {
-          width: 100%;
-          justify-content: center;
-     }
-}
-
-/* Grid de tarjetas compartido */
+/* Cuadrícula de tarjetas con soporte multi-vista */
 .cards-grid {
      display: grid;
      gap: var(--spacing-xl);
@@ -387,7 +374,6 @@ button {
      }
 
      .cards-grid.view-grid {
-          /* 1 columna en móvil para que la tarjeta tenga espacio de aire */
           grid-template-columns: 1fr;
      }
 }

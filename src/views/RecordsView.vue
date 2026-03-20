@@ -1,11 +1,12 @@
 <template>
      <div class="container section-padding fade-in">
+          <!-- Encabezado de la página: Identificación del catálogo -->
           <header class="page-header">
                <h1 class="page-title">Catálogo de <span class="highlight">Registros</span></h1>
                <p class="page-subtitle">Explora todos los registros disponibles.</p>
           </header>
 
-          <!-- Barra de Herramientas -->
+          <!-- Barra de Herramientas: Control de visualización y métricas de resultados -->
           <div class="toolbar" v-if="!loading">
                <div class="view-options">
                     <button v-for="mode in ['grid', 'list', 'magazine']" :key="mode" @click="viewMode = mode"
@@ -16,14 +17,16 @@
                <div class="results-info">Mostrando {{ itemsPerPage }} de {{ totalItems }} resultados</div>
           </div>
 
-          <!-- Contenido -->
+          <!-- Área de visualización de contenidos -->
           <div v-if="loading" class="loading-wrapper"><span class="loader"></span></div>
           <div v-else>
                <div :class="['grid-system', `view-${viewMode}`]">
+                    <!-- Renderizado dinámico de tarjetas de registro -->
                     <CommonCard v-for="(record, idx) in records" :key="record.id" :item="record" type="record"
                          :view-mode="viewMode" :reverse="idx % 2 !== 0" />
                </div>
 
+               <!-- Navegación paginada de los registros -->
                <ThePagination :current-page="currentPage" :total-items="totalItems" :items-per-page="itemsPerPage"
                     @change="onPageChange" />
           </div>
@@ -31,6 +34,15 @@
 </template>
 
 <script setup>
+/**
+ * Vista RecordsView.
+ * 
+ * Gestiona el catálogo general de registros. Proporciona una interfaz fluida
+ * para navegar por grandes conjuntos de datos, permitiendo al usuario cambiar
+ * el modo de visualización y paginar los resultados, manteniendo el estado
+ * sincronizado con la URL para facilitar la navegación historial.
+ */
+
 import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
@@ -40,6 +52,7 @@ import ThePagination from '../components/ThePagination.vue';
 const route = useRoute();
 const router = useRouter();
 
+// Estado reactivo del componente
 const records = ref([]);
 const loading = ref(true);
 const viewMode = ref('grid');
@@ -47,19 +60,29 @@ const currentPage = ref(1);
 const totalItems = ref(0);
 const itemsPerPage = ref(24);
 
+// Configuración de visualizaciones permitidas
 const allowedViewModes = new Set(['grid', 'list', 'magazine']);
 const isSyncingFromRoute = ref(false);
 
+/**
+ * Normaliza y valida el índice de la página desde los parámetros de la URL.
+ */
 const parsePage = (p) => {
      const n = Number.parseInt(String(p ?? ''), 10);
      return Number.isFinite(n) && n > 0 ? n : 1;
 };
 
+/**
+ * Valida que el modo de visualización esté dentro de los estándares del sistema.
+ */
 const parseView = (v) => {
      const s = String(v ?? '');
      return allowedViewModes.has(s) ? s : 'grid';
 };
 
+/**
+ * Inicializa el estado reactivo basándose en los parámetros query de la ruta actual.
+ */
 const syncStateFromRoute = () => {
      isSyncingFromRoute.value = true;
      viewMode.value = parseView(route.query.view);
@@ -67,6 +90,10 @@ const syncStateFromRoute = () => {
      isSyncingFromRoute.value = false;
 };
 
+/**
+ * Actualiza los parámetros de la URL para reflejar los cambios realizados en la UI.
+ * Utiliza 'push' para habilitar la navegación regresiva del navegador.
+ */
 const pushStateToRoute = async () => {
      if (isSyncingFromRoute.value) return;
      const nextQuery = {
@@ -75,13 +102,15 @@ const pushStateToRoute = async () => {
           page: String(currentPage.value),
      };
 
-     // Evitar navegación redundante
+     // Optimización: Detener la navegación si el estado destino es idéntico al actual
      if (route.query.view === nextQuery.view && String(route.query.page ?? '') === nextQuery.page) return;
 
-     // Usamos push para que el botón "atrás" recupere el estado anterior (modo/página)
      await router.push({ query: nextQuery });
 };
 
+/**
+ * Recupera el lote de registros del servidor correspondiente a la página actual.
+ */
 const fetchRecords = async () => {
      loading.value = true;
      const offset = (currentPage.value - 1) * itemsPerPage.value;
@@ -92,24 +121,27 @@ const fetchRecords = async () => {
           records.value = res.data.items || [];
           totalItems.value = res.data.total_items || res.data.total || 0;
      } catch (e) {
-          console.error(e);
+          console.error("Error al cargar registros:", e);
      } finally {
           loading.value = false;
+          // Efecto de desplazamiento suave hacia la parte superior tras la carga
           window.scrollTo({ top: 0, behavior: 'smooth' });
      }
 };
 
+/**
+ * Manejador del evento de cambio de página emitido por el componente de paginación.
+ */
 const onPageChange = (p) => {
      currentPage.value = p;
 };
 
-// 1) Inicializa desde la URL (para soportar "atrás" y recargas)
 onMounted(() => {
      syncStateFromRoute();
      fetchRecords();
 });
 
-// 2) Si cambia la URL (ej. botón atrás), actualiza estado y refetch si procede
+// Observador de la ruta para gestionar la navegación externa (ej. botón atrás del navegador)
 watch(
      () => [route.query.page, route.query.view],
      () => {
@@ -122,15 +154,17 @@ watch(
      }
 );
 
-// 3) Si cambia el estado por UI (modo/paginación), lo reflejamos en la URL y refetch en cambios de página
+// Observadores del estado interno para automatizar la persistencia en la URL
 watch(viewMode, () => {
      pushStateToRoute();
 });
+
 watch(currentPage, () => {
      pushStateToRoute();
      fetchRecords();
 });
 </script>
+
 
 <style scoped>
 .page-header {
