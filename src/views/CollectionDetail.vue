@@ -13,14 +13,14 @@
           <!-- Estado de carga: Transición durante la recuperación de metadatos de la colección -->
           <div v-if="loadingCol" class="loading-wrapper"><span class="loader"></span> Cargando...</div>
 
-          <!-- Cabecera de la Colección: Presentación visual con imagen de fondo y descripción -->
-          <div v-else-if="collection" class="collection-hero">
-               <div class="hero-bg">
-                    <img v-if="collection.thumbnail" :src="getThumbnail(collection.thumbnail, 'large')" />
+          <!-- Cabecera de la Colección: Presentación visual con imagen de fondo (se oculta si no hay miniatura) -->
+          <div v-else-if="collection" class="collection-hero" :class="{ 'no-thumb': !collection.thumbnail }">
+               <div class="hero-bg" v-if="collection.thumbnail">
+                    <img :src="getThumbnail(collection.thumbnail, 'large')" />
                     <div class="overlay"></div>
                </div>
                <div class="hero-content">
-                    <span class="badge">Colección</span>
+                    <span class="badge" v-if="collection.thumbnail">Colección</span>
                     <h1 class="hero-title">{{ collection.title }}</h1>
                     <p class="hero-desc">{{ collection.description }}</p>
                </div>
@@ -36,7 +36,7 @@
                <!-- Gestión de estados de carga y resultados vacíos -->
                <div v-if="loadingRec" class="loading-wrapper"><span class="loader"></span></div>
                <div v-else-if="records.length === 0" class="empty">No hay obras registradas en esta colección.</div>
-               
+
                <!-- Visualización de registros mediante rejilla adaptativa -->
                <div v-else>
                     <div class="grid-auto">
@@ -176,6 +176,23 @@ onMounted(() => {
      align-items: center;
      justify-content: center;
      margin-bottom: 5rem;
+     background: var(--bg-color);
+}
+
+.collection-hero.no-thumb {
+     height: auto;
+     min-height: 250px;
+     background: var(--surface-card);
+     border: 1px solid var(--border-color);
+     margin-bottom: 3rem;
+}
+
+.collection-hero.no-thumb .hero-content {
+     color: var(--text-primary);
+}
+
+.collection-hero.no-thumb .hero-desc {
+     color: var(--text-secondary);
 }
 
 .hero-bg {

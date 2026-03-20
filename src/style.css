@@ -140,26 +140,9 @@ button {
 .container {
      max-width: var(--container-max);
      margin: 0 auto;
-     padding: 0 1.5rem;
+     /* Garantizamos una separación mínima fluida con los bordes de la pantalla */
+     padding: 0 clamp(1.5rem, 6vw, 5rem);
      width: 100%;
-}
-
-@media (min-width: 480px) {
-     .container {
-          padding: 0 2rem;
-     }
-}
-
-@media (min-width: 768px) {
-     .container {
-          padding: 0 3rem;
-     }
-}
-
-@media (min-width: 1200px) {
-     .container {
-          padding: 0 4rem;
-     }
 }
 
 /* Espaciado estándar para secciones del contenido principal */

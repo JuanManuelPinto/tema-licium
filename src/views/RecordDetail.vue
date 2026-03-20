@@ -55,7 +55,7 @@
                                              class="main-img" alt="Imagen del registro" />
                                         <img v-else-if="record.thumbnail" :src="getThumbnail(record.thumbnail, 'large')"
                                              class="main-img" alt="Imagen del registro" />
-                                        <div v-else class="no-img-placeholder">Sin Imagen Disponible</div>
+                                        <div v-else class="no-img-placeholder">Registro</div>
                                    </div>
 
                                    <!-- Selector de galería para registros con múltiples elementos de medios -->
@@ -125,8 +125,8 @@
                               <!-- Contenedor de la imagen proyectada con soporte para zoom reactivo -->
                               <div class="lightbox-viewer" :class="{ 'is-zoomed': isZoomed }">
                                    <img :src="getThumbnail(record.media_items[currentImageIndex]?.path || record.media_items[currentImageIndex]?.thumbnail || record.thumbnail, 'large')"
-                                         class="lightbox-img" @click="toggleZoom"
-                                         :title="isZoomed ? 'Click para reducir' : 'Click para zoom'" />
+                                        class="lightbox-img" @click="toggleZoom"
+                                        :title="isZoomed ? 'Click para reducir' : 'Click para zoom'" />
 
                                    <div class="lightbox-caption" v-if="record.media_items[currentImageIndex]?.title">
                                         {{ record.media_items[currentImageIndex].title }}
@@ -427,7 +427,7 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
      justify-content: center;
      margin-bottom: 2rem;
      cursor: pointer;
-     transition: transform 0.3s;
+     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .main-image-wrapper:hover {
@@ -443,7 +443,10 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
 
 .no-img-placeholder {
      color: var(--text-muted);
-     font-style: italic;
+     font-weight: 700;
+     text-transform: uppercase;
+     letter-spacing: 0.1em;
+     font-size: var(--fs-md);
 }
 
 .section-label {
@@ -462,7 +465,10 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
      display: flex;
      gap: 1rem;
      overflow-x: auto;
-     padding-bottom: 1rem;
+     /* Añadimos padding en todos los lados para que el escalado y las sombras no se corten */
+     padding: 0.5rem;
+     padding-bottom: 1.5rem;
+     margin: -0.5rem;
      scrollbar-width: thin;
 }
 
@@ -471,19 +477,22 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
      height: 100px;
      border-radius: var(--radius-md);
      overflow: hidden;
-     border: 1px solid var(--border-color);
+     /* Usamos un borde de 2px siempre para evitar que el contenido "salte" al activarse */
+     border: 2px solid var(--border-color);
      cursor: pointer;
-     transition: transform 0.3s;
+     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .gallery-thumb:hover {
      transform: scale(1.05);
+     border-color: var(--text-muted);
+     z-index: 2;
 }
 
 .gallery-thumb.active {
      border-color: var(--primary-color);
-     border-width: 2px;
-     box-shadow: 0 0 0 2px var(--primary-color);
+     /* Sombra interna para asegurar que sea visible sin depender del clipping del padre */
+     box-shadow: 0 0 0 2px var(--primary-color), inset 0 0 0 2px rgba(255, 255, 255, 0.2);
 }
 
 .gallery-thumb img {

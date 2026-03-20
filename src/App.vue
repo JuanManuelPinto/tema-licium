@@ -220,21 +220,24 @@ watch(() => route.path, () => {
      width: 100%;
 }
 
+.app-header,
 .app-main {
-     flex: 1;
-     padding: var(--spacing-3xl) 0;
+     /* Asegura una separación mínima con los bordes de la pantalla en todo momento */
+     padding-left: clamp(1rem, 5vw, 3rem);
+     padding-right: clamp(1rem, 5vw, 3rem);
 }
 
+.app-main {
+     flex: 1;
+     padding-top: var(--spacing-3xl);
+     padding-bottom: var(--spacing-3xl);
+}
+
+/* En móvil añadimos un pequeño gutter vertical extra */
 @media (max-width: 768px) {
      .app-main {
-          /* En móvil añadimos “gutter” lateral para que el contenido no toque los bordes */
-          padding: var(--spacing-xl) 1rem;
-     }
-
-     /* Si la vista ya viene envuelta en .container (caso habitual), evitamos doble padding */
-     .app-main :deep(> .container) {
-          padding-left: 0;
-          padding-right: 0;
+          padding-top: var(--spacing-xl);
+          padding-bottom: var(--spacing-xl);
      }
 }
 
