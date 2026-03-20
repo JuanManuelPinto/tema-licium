@@ -140,8 +140,8 @@ button {
 .container {
      max-width: var(--container-max);
      margin: 0 auto;
-     /* Garantizamos una separación mínima fluida con los bordes de la pantalla */
-     padding: 0 clamp(1.5rem, 6vw, 5rem);
+     /* Ajustamos el mínimo a 1rem (16px) para maximizar el espacio útil en móviles estrechos */
+     padding: 0 clamp(1rem, 6vw, 5rem);
      width: 100%;
 }
 

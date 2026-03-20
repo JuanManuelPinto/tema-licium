@@ -223,8 +223,8 @@ watch(() => route.path, () => {
 .app-header,
 .app-main {
      /* Asegura una separación mínima con los bordes de la pantalla en todo momento */
-     padding-left: clamp(1rem, 5vw, 3rem);
-     padding-right: clamp(1rem, 5vw, 3rem);
+     padding-left: clamp(0.75rem, 5vw, 3rem);
+     padding-right: clamp(0.75rem, 5vw, 3rem);
 }
 
 .app-main {

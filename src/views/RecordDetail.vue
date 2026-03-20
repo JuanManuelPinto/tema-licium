@@ -330,13 +330,22 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
      margin-bottom: 3rem;
 }
 
+@media (max-width: 768px) {
+     .record-header {
+          margin-bottom: 1.5rem;
+     }
+}
+
+
 .header-nav {
      display: flex;
+     flex-wrap: wrap;
      justify-content: space-between;
      align-items: center;
      padding: 1.5rem 0;
      border-bottom: 1px solid var(--border-color);
      margin-bottom: 2rem;
+     gap: 1rem;
 }
 
 .btn-back {
@@ -368,6 +377,13 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
      gap: 1rem;
      margin-bottom: 1.5rem;
 }
+
+@media (max-width: 768px) {
+     .meta-badges {
+          margin-bottom: 0.75rem;
+     }
+}
+
 
 .collection-links {
      display: flex;
@@ -402,6 +418,15 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
      grid-template-columns: 1fr;
      gap: 4rem;
 }
+
+@media (max-width: 768px) {
+     .content-grid {
+          /* minmax(0, 1fr) es vital para evitar que elementos anchos expandan el grid */
+          grid-template-columns: minmax(0, 1fr);
+          gap: 2.5rem;
+     }
+}
+
 
 @media (min-width: 1024px) {
      .content-grid {
@@ -439,7 +464,15 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
      height: 100%;
      object-fit: contain;
      padding: 2rem;
+     transition: padding 0.3s;
 }
+
+@media (max-width: 768px) {
+     .main-img {
+          padding: 1rem;
+     }
+}
+
 
 .no-img-placeholder {
      color: var(--text-muted);
@@ -465,12 +498,35 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
      display: flex;
      gap: 1rem;
      overflow-x: auto;
-     /* Añadimos padding en todos los lados para que el escalado y las sombras no se corten */
-     padding: 0.5rem;
-     padding-bottom: 1.5rem;
-     margin: -0.5rem;
-     scrollbar-width: thin;
+     padding: 0.5rem 0;
+     margin-bottom: 2rem;
+     /* En desktop por defecto envolveremos si hay espacio */
+     flex-wrap: wrap;
+     overflow-y: hidden;
+     transition: all 0.3s;
 }
+
+@media (max-width: 1023px) {
+     .gallery-scroll {
+          flex-wrap: nowrap;
+          /* Mostramos una barra de scroll sutil en móvil para indicar que hay más */
+          scrollbar-width: thin;
+          scrollbar-color: var(--primary-color) transparent;
+          padding-bottom: 1rem;
+     }
+
+     .gallery-scroll::-webkit-scrollbar {
+          display: block;
+          height: 3px;
+     }
+
+     .gallery-scroll::-webkit-scrollbar-thumb {
+          background: var(--primary-color);
+          border-radius: 10px;
+     }
+}
+
+
 
 .gallery-thumb {
      flex: 0 0 100px;
@@ -550,10 +606,25 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
           font-size: var(--fs-2xl);
      }
 
+     .header-nav {
+          padding: 1rem 0;
+     }
+
+     .breadcrumb {
+          display: none;
+          /* Simplificamos ocultando la ruta en móvil para ganar aire */
+     }
+
+     .meta-badges {
+          flex-wrap: wrap;
+          gap: 0.5rem;
+     }
+
      .metadata-card {
           padding: 1.5rem;
-          margin: 0 -0.5rem;
-          width: calc(100% + 1rem);
+          /* Reducimos el sangrado negativo para evitar conflictos con el gutter global */
+          margin: 1.5rem 0;
+          width: 100%;
      }
 
      .metadata-item {
@@ -562,11 +633,55 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
      }
 
      .main-image-wrapper {
-          aspect-ratio: 1/1;
+          aspect-ratio: 4/3;
+          min-height: 200px;
+          height: auto;
+          margin-bottom: 1.5rem;
+          padding: 0;
+          overflow: hidden;
+     }
+
+     .main-img {
+          /* Usamos max-width/height para ser más defensivos con imágenes muy anchas */
+          max-width: 100%;
+          max-height: 100%;
+          width: auto;
+          height: auto;
+          object-fit: contain;
+          padding: 1rem;
+     }
+
+
+
+     .gallery-thumb {
+          /* Usamos un ancho porcentual o calculado para que la siguiente imagen siempre asome */
+          flex: 0 0 130px;
+          height: 100px;
+     }
+
+     .gallery-scroll {
+          /* Margen negativo para permitir que el scroll se pegue al borde de la pantalla si es necesario */
+          padding-right: 2rem;
+     }
+
+     .content-grid {
+          gap: 2.5rem;
+     }
+
+
+     .description-area {
+          margin-bottom: 3rem;
      }
 
      .description-text {
-          font-size: 1rem;
+          font-size: 1.05rem;
+          line-height: 1.7;
+     }
+
+     .metadata-card {
+          margin: 0;
+          padding: 1.5rem;
+          border-radius: var(--radius-md);
      }
 }
 </style>
