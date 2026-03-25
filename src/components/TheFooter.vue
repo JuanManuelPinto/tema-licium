@@ -38,9 +38,9 @@
                     <div class="footer-group">
                          <h3 class="footer-heading">Contacto</h3>
                          <ul class="footer-list">
-                              <li><a href="mailto:info@liciumgadir.com">info@liciumgadir.com</a></li>
+                              <li><a href="#">Licium Gadir</a></li>
                               <li><span>Cádiz, España</span></li>
-                              <li><a href="https://instagram.com/liciumgadir" target="_blank">Instagram</a></li>
+                              <li><a href="#">Licium Gadir</a></li>
                          </ul>
                     </div>
                </div>
@@ -48,7 +48,7 @@
           <!-- Barra inferior para avisos de derechos de autor y créditos -->
           <div class="footer-bottom">
                <div class="container">
-                    <p>&copy; 2026 LICIUM GADIR. Todos los derechos reservados.</p>
+                    <p>&copy; 2026 LICIUM GADIR.</p>
                </div>
           </div>
      </footer>
