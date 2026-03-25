@@ -25,12 +25,6 @@
                                    active-class="active">Colecciones</router-link>
                               <router-link to="/search" class="nav-link" active-class="active">Buscador</router-link>
                          </div>
-
-                         <!-- Pie de página exclusivo para el menú móvil -->
-                         <div class="nav-footer-mobile">
-                              <p class="nav-motto">Patrimonio Histórico Digital</p>
-                              <div class="nav-decoration"></div>
-                         </div>
                     </nav>
 
                     <!-- Acciones del encabezado: Selector de tema y menú móvil -->
