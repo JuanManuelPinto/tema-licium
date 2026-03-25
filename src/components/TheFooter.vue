@@ -6,10 +6,10 @@
                <div class="footer-brand-section">
                     <div class="brand">
                          <h2 class="brand-text">LICIUM</h2>
-                         <span class="brand-sub">THEME</span>
+                         <span class="brand-sub">GADIR</span>
                     </div>
                     <p class="footer-tagline">
-                         Licium Theme.
+                         Tu portal digital para la gestión y exploración de colecciones y registros.
                     </p>
                </div>
 
@@ -17,29 +17,30 @@
                <div class="footer-links-grid">
                     <!-- Grupo de Navegación Principal -->
                     <div class="footer-group">
-                         <h3 class="footer-heading">Explorar</h3>
+                         <h3 class="footer-heading">Navegación</h3>
                          <ul class="footer-list">
                               <li><router-link to="/">Inicio</router-link></li>
-                              <li><router-link to="/collections">Colecciones</router-link></li>
-                              <li><router-link to="/search">Buscador Avanzado</router-link></li>
                               <li><router-link to="/explore">Registros</router-link></li>
+                              <li><router-link to="/collections">Colecciones</router-link></li>
+                              <li><router-link to="/search">Buscador</router-link></li>
                          </ul>
                     </div>
                     <!-- Grupo de Información Legal/Corporativa -->
                     <div class="footer-group">
-                         <h3 class="footer-heading">Información</h3>
+                         <h3 class="footer-heading">Legal</h3>
                          <ul class="footer-list">
-                              <li><a href="#">Licium Theme</a></li>
-                              <li><a href="#">Licium Theme</a></li>
-                              <li><a href="#">Licium Theme</a></li>
+                              <li><a href="#">Aviso Legal</a></li>
+                              <li><a href="#">Política de Privacidad</a></li>
+                              <li><a href="#">Cookies</a></li>
                          </ul>
                     </div>
                     <!-- Grupo de Soporte y Contacto -->
                     <div class="footer-group">
                          <h3 class="footer-heading">Contacto</h3>
                          <ul class="footer-list">
-                              <li><a href="#">Licium Theme</a></li>
-                              <li><span>Licium Theme</span></li>
+                              <li><a href="mailto:info@liciumgadir.com">info@liciumgadir.com</a></li>
+                              <li><span>Cádiz, España</span></li>
+                              <li><a href="https://instagram.com/liciumgadir" target="_blank">Instagram</a></li>
                          </ul>
                     </div>
                </div>
@@ -47,7 +48,7 @@
           <!-- Barra inferior para avisos de derechos de autor y créditos -->
           <div class="footer-bottom">
                <div class="container">
-                    <p>&copy; 2026 Licium Theme.</p>
+                    <p>&copy; 2026 LICIUM GADIR. Todos los derechos reservados.</p>
                </div>
           </div>
      </footer>

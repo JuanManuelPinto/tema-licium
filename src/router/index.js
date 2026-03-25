@@ -5,6 +5,7 @@ import CollectionsView from '../views/CollectionsView.vue'
 import CollectionDetail from '../views/CollectionDetail.vue'
 import SearchView from '../views/SearchView.vue'
 import RecordsView from '../views/RecordsView.vue'
+import RecordMediaView from '../views/RecordMediaView.vue'
 
 /**
  * CONFIGURACIÓN DEL ENRUTADOR DE LA APLICACIÓN
@@ -47,6 +48,11 @@ const router = createRouter({
                path: '/search',
                name: 'search',
                component: SearchView,
+          },
+          {
+               path: '/record/:id/media',
+               name: 'record-media',
+               component: RecordMediaView,
           },
      ],
      /**

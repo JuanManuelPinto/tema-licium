@@ -6,15 +6,31 @@
                     <!-- Marca y logotipo con enlace a la página de inicio -->
                     <router-link to="/" class="brand">
                          <h1 class="brand-text">LICIUM</h1>
-                         <span class="brand-sub">THEME</span>
+                         <span class="brand-sub">GADIR</span>
                     </router-link>
 
-                    <!-- Navegación principal para escritorio -->
+                    <!-- Navegación principal para escritorio y móvil -->
                     <nav class="app-nav" :class="{ 'nav-open': isMenuOpen }">
-                         <router-link to="/" class="nav-link" active-class="active">Inicio</router-link>
-                         <router-link to="/explore" class="nav-link" active-class="active">Registros</router-link>
-                         <router-link to="/collections" class="nav-link" active-class="active">Colecciones</router-link>
-                         <router-link to="/search" class="nav-link" active-class="active">Buscador</router-link>
+                         <!-- Branding exclusivo para el menú móvil -->
+                         <div class="nav-brand-mobile">
+                              <span class="brand-text">LICIUM</span>
+                              <span class="brand-sub">GADIR</span>
+                         </div>
+
+                         <!-- Enlaces de navegación -->
+                         <div class="nav-links-wrapper">
+                              <router-link to="/" class="nav-link" active-class="active">Inicio</router-link>
+                              <router-link to="/explore" class="nav-link" active-class="active">Registros</router-link>
+                              <router-link to="/collections" class="nav-link"
+                                   active-class="active">Colecciones</router-link>
+                              <router-link to="/search" class="nav-link" active-class="active">Buscador</router-link>
+                         </div>
+
+                         <!-- Pie de página exclusivo para el menú móvil -->
+                         <div class="nav-footer-mobile">
+                              <p class="nav-motto">Patrimonio Histórico Digital</p>
+                              <div class="nav-decoration"></div>
+                         </div>
                     </nav>
 
                     <!-- Acciones del encabezado: Selector de tema y menú móvil -->
@@ -162,7 +178,17 @@ watch(() => route.path, () => {
 
 .app-nav {
      display: flex;
+     align-items: center;
+}
+
+.nav-links-wrapper {
+     display: flex;
      gap: 2.5rem;
+}
+
+.nav-brand-mobile,
+.nav-footer-mobile {
+     display: none;
 }
 
 .header-actions {
@@ -280,25 +306,26 @@ watch(() => route.path, () => {
           right: -100%;
           width: 100%;
           height: 100vh;
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(15px);
-          -webkit-backdrop-filter: blur(15px);
+          background: var(--surface-color);
           flex-direction: column;
-          justify-content: center;
+          justify-content: space-between;
           align-items: center;
-          gap: 2rem;
-          transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          padding: 8rem 2rem 4rem 2rem;
+          transition: right 0.6s cubic-bezier(0.16, 1, 0.3, 1);
           z-index: 1500;
-          padding: 2rem;
+          overflow: hidden;
      }
 
-     /* Background color fallback for transparent header overlap */
      .app-nav::before {
           content: '';
           position: absolute;
-          inset: 0;
-          background: var(--surface-color);
-          opacity: 0.8;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(135deg,
+                    var(--surface-color) 0%,
+                    rgba(var(--primary-color-rgb), 0.03) 100%);
           z-index: -1;
      }
 
@@ -306,31 +333,123 @@ watch(() => route.path, () => {
           right: 0;
      }
 
+     .nav-brand-mobile {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          border-bottom: 1px solid var(--border-color);
+          width: 100%;
+          max-width: 200px;
+          padding-bottom: 2rem;
+          opacity: 0;
+          transform: translateY(-20px);
+          transition: all 0.6s ease 0.2s;
+     }
+
+     .nav-open .nav-brand-mobile {
+          opacity: 1;
+          transform: translateY(0);
+     }
+
+     .nav-brand-mobile .brand-text {
+          font-family: var(--font-heading);
+          font-size: 2.5rem;
+          letter-spacing: 0.25em;
+          color: var(--primary-color);
+          margin-bottom: 0.5rem;
+          line-height: 1;
+     }
+
+     .nav-brand-mobile .brand-sub {
+          display: block;
+          font-size: 0.85rem;
+          letter-spacing: 0.6em;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+     }
+
+     .nav-links-wrapper {
+          flex-direction: column;
+          align-items: center;
+          gap: 2.5rem;
+          flex: 1;
+          justify-content: center;
+          width: 100%;
+     }
+
+     .nav-footer-mobile {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+          opacity: 0;
+          transform: translateY(20px);
+          transition: all 0.6s ease 0.4s;
+     }
+
+     .nav-open .nav-footer-mobile {
+          opacity: 1;
+          transform: translateY(0);
+     }
+
+     .nav-motto {
+          font-family: var(--font-heading);
+          font-size: 1.125rem;
+          font-style: italic;
+          color: var(--text-muted);
+          margin-bottom: 1.5rem;
+     }
+
+     .nav-decoration {
+          width: 40px;
+          height: 1px;
+          background: var(--primary-color);
+          opacity: 0.5;
+     }
+
      .nav-link {
           font-size: 1.5rem;
-          letter-spacing: 0.2em;
+          font-family: var(--font-heading);
+          font-weight: 500;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
           opacity: 0;
-          transform: translateX(30px);
-          transition: all 0.4s ease;
-          transition-delay: 0.1s;
+          transform: translateY(20px);
+          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          padding: 0.5rem 0;
+          color: var(--text-secondary);
      }
 
      .app-nav.nav-open .nav-link {
           opacity: 1;
-          transform: translateX(0);
+          transform: translateY(0);
      }
 
-     /* Staggered animation for links */
-     .app-nav.nav-open .nav-link:nth-child(2) {
-          transition-delay: 0.2s;
+     .nav-link.active {
+          color: var(--primary-color);
      }
 
-     .app-nav.nav-open .nav-link:nth-child(3) {
+     .nav-link:hover {
+          color: var(--primary-color);
+          transform: scale(1.1);
+     }
+
+     /* Animación escalonada para los enlaces */
+     .app-nav.nav-open .nav-link:nth-child(1) {
           transition-delay: 0.3s;
      }
 
-     .app-nav.nav-open .nav-link:nth-child(4) {
+     .app-nav.nav-open .nav-link:nth-child(2) {
           transition-delay: 0.4s;
+     }
+
+     .app-nav.nav-open .nav-link:nth-child(3) {
+          transition-delay: 0.5s;
+     }
+
+     .app-nav.nav-open .nav-link:nth-child(4) {
+          transition-delay: 0.6s;
      }
 
      .hamburger.is-active span:nth-child(1) {

@@ -62,12 +62,20 @@
                                    <div class="gallery-section" v-if="record.media_items?.length">
                                         <h3 class="section-label">Galería de Imágenes</h3>
                                         <div class="gallery-scroll">
-                                             <div v-for="(m, idx) in record.media_items" :key="m.id"
+                                             <div v-for="(m, idx) in displayedMedia" :key="m.id"
                                                   class="gallery-thumb" :class="{ 'active': isSelected(m) }"
                                                   @click="setMainImage(m)">
                                                   <img :src="getThumbnail(m.thumbnail || m.path, 'small')"
                                                        :alt="m.title || 'Miniatura'" />
                                              </div>
+                                             
+                                             <!-- Botón Ver más si hay más de 2 medios -->
+                                             <router-link v-if="hasMoreMedia" :to="{ name: 'record-media', params: { id: record.id } }" class="btn-more-media">
+                                                  <div class="more-content">
+                                                       <span>+{{ record.media_items.length - 2 }}</span>
+                                                       <small>Ver todos</small>
+                                                  </div>
+                                             </router-link>
                                         </div>
                                    </div>
                               </div>
@@ -159,7 +167,7 @@
  * interactivo (lightbox), asegurando una experiencia de usuario fluida y coherente.
  */
 
-import { ref, onMounted, watch, onUnmounted } from 'vue';
+import { ref, onMounted, watch, onUnmounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 
@@ -174,6 +182,10 @@ const selectedImage = ref(null);
 const showLightbox = ref(false);
 const currentImageIndex = ref(0);
 const isZoomed = ref(false);
+
+// Estados para la gestión de medios limitados
+const displayedMedia = computed(() => record.value?.media_items?.slice(0, 2) || []);
+const hasMoreMedia = computed(() => (record.value?.media_items?.length || 0) > 2);
 
 /**
  * Solicita los datos detallados del registro al servidor GLAM.
@@ -555,6 +567,46 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
      width: 100%;
      height: 100%;
      object-fit: cover;
+}
+
+.btn-more-media {
+     flex: 0 0 100px;
+     height: 100px;
+     background: var(--surface-color);
+     border: 2px dashed var(--border-color);
+     border-radius: var(--radius-md);
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     text-align: center;
+     transition: all 0.3s;
+     cursor: pointer;
+}
+
+.btn-more-media:hover {
+     border-color: var(--primary-color);
+     background: rgba(var(--primary-color-rgb), 0.05);
+     transform: scale(1.05);
+}
+
+.more-content {
+     display: flex;
+     flex-direction: column;
+}
+
+.btn-more-media span {
+     display: block;
+     font-size: 1.2rem;
+     font-weight: 700;
+     color: var(--primary-color);
+}
+
+.btn-more-media small {
+     font-size: 0.65rem;
+     text-transform: uppercase;
+     font-weight: 700;
+     color: var(--text-muted);
+     letter-spacing: 0.05em;
 }
 
 .description-area {

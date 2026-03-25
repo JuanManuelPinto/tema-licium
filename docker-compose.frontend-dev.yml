@@ -1,0 +1,28 @@
+services:
+  frontend-dev:
+    image: ${FRONTEND_DEV_IMAGE:?Set FRONTEND_DEV_IMAGE to the private frontend dev image}
+    working_dir: /opt/licium
+    command: npm run dev
+    init: true
+    tty: true
+    ports:
+      - "${FRONTEND_DEV_PORT:-3000}:3000"
+    environment:
+      NUXT_TELEMETRY_DISABLED: "1"
+      NUXT_PUBLIC_API_BASE: ${NUXT_PUBLIC_API_BASE:-/api}
+      NUXT_API_BASE_INTERNAL: ${NUXT_API_BASE_INTERNAL:-}
+      NUXT_API_PROXY_TARGET: ${NUXT_API_PROXY_TARGET:-http://host.docker.internal:8000}
+      NUXT_ALLOWED_HOSTS: ${NUXT_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=8192}
+      CHOKIDAR_USEPOLLING: ${CHOKIDAR_USEPOLLING:-1}
+      CHOKIDAR_INTERVAL: ${CHOKIDAR_INTERVAL:-300}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - type: bind
+        source: ${THEME_SOURCE_DIR:?Set THEME_SOURCE_DIR to the absolute path of the theme fork}
+        target: /opt/licium/themes/${THEME_TARGET_KIND:-site}/${THEME_TARGET_SLUG:?Set THEME_TARGET_SLUG to the theme slug inside the image}
+      - frontend-dev-nuxt:/opt/licium/.nuxt
+
+volumes:
+  frontend-dev-nuxt:

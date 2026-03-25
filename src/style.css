@@ -1,5 +1,5 @@
 /**
- * SISTEMA DE DISEÑO GLOBAL - LICIUM THEME
+ * SISTEMA DE DISEÑO GLOBAL - LICIUM GADIR
  * 
  * Este archivo centraliza la identidad visual del proyecto, definiendo la paleta
  * cromática, la escala tipográfica fluida, el sistema de espaciado y los estilos
@@ -12,6 +12,7 @@
      /* --- PALETA CROMÁTICA --- */
      /* El dorado #d4af37 es el color de marca principal para acentos y elementos de énfasis */
      --primary-color: #d4af37;
+     --primary-color-rgb: 212, 175, 55;
      --primary-hover: #b5952f;
      --accent-color: #d4af37;
 

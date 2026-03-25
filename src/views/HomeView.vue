@@ -11,8 +11,8 @@
 
             <!-- Contenido central del Hero -->
             <div class="container hero-content">
-                <h1 class="hero-title">Ejemplo Theme <br /> <span class="highlight">LICIUM</span></h1>
-                <p class="hero-text">Tema propio de Licium.</p>
+                <h1 class="hero-title">Explora <br /> <span class="highlight">LICIUM GADIR</span></h1>
+                <p class="hero-text">Gestión Avanzada de Colecciones y Registros Digitales.</p>
 
                 <!-- Barra de búsqueda rápida integrada en el Hero -->
                 <div class="search-box">
