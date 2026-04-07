@@ -91,7 +91,17 @@
 
                               <!-- Ficha técnica institucional basada en metadatos canónicos -->
                               <div class="metadata-card" v-if="record.canonical_joined_metadata">
-                                   <h3 class="section-label">Ficha Técnica</h3>
+                                   <div class="metadata-header">
+                                        <h3 class="section-label">Ficha Técnica</h3>
+                                        <button @click="showMetadataModal = true" class="btn-info-detail" title="Ver metadatos completos">
+                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                                  <circle cx="12" cy="12" r="10" />
+                                                  <path d="M12 16v-4" />
+                                                  <path d="M12 8h.01" />
+                                             </svg>
+                                             Metadatos
+                                        </button>
+                                   </div>
                                    <div class="metadata-list">
                                         <template v-for="(meta, key) in record.canonical_joined_metadata" :key="key">
                                              <div class="metadata-item" v-if="meta.values?.length">
@@ -153,6 +163,56 @@
                     </Transition>
                </Teleport>
 
+               <!-- Modal de Metadatos Detallados -->
+               <Teleport to="body">
+                    <Transition name="fade">
+                         <div v-if="showMetadataModal" class="metadata-modal-overlay" @click.self="closeMetadataModal">
+                              <div class="metadata-modal">
+                                   <header class="modal-header">
+                                        <h2>Detalles del Registro</h2>
+                                        <button class="modal-close" @click="closeMetadataModal" title="Cerrar">
+                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                                  <path d="M18 6 6 18M6 6l12 12" />
+                                             </svg>
+                                        </button>
+                                   </header>
+                                   
+                                   <div class="modal-body">
+                                        <div class="modal-section" v-if="record">
+                                             <h3 class="modal-subtitle">Identificación del Registro</h3>
+                                             <div class="system-meta-grid">
+                                                  <div class="system-meta-item" v-if="record.identifier || record.metadata?.identifier">
+                                                       <div class="system-meta-label">Identificador</div>
+                                                       <div class="system-meta-value">{{ formatValue(record.identifier || record.metadata?.identifier) }}</div>
+                                                  </div>
+                                                  <div class="system-meta-item" v-if="record.id">
+                                                       <div class="system-meta-label">ID Sistema</div>
+                                                       <div class="system-meta-value">{{ record.id }}</div>
+                                                  </div>
+                                                  <div class="system-meta-item" v-if="record.language || record.metadata?.language">
+                                                       <div class="system-meta-label">Idioma</div>
+                                                       <div class="system-meta-value">{{ formatValue(record.language || record.metadata?.language) }}</div>
+                                                  </div>
+                                             </div>
+                                        </div>
+
+                                        <div class="modal-section" v-if="record.joined_metadata">
+                                             <h3 class="modal-subtitle">Ficha Técnica Completa</h3>
+                                             <div class="full-metadata-list">
+                                                  <div v-for="(meta, key) in record.joined_metadata" :key="key" class="full-metadata-item">
+                                                       <div class="full-metadata-label">{{ meta.label || key }}</div>
+                                                       <div class="full-metadata-value">
+                                                            {{meta.values?.map(v => formatValue(v)).join(', ') || '—'}}
+                                                       </div>
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+                    </Transition>
+               </Teleport>
+
           </div>
      </div>
 </template>
@@ -183,6 +243,8 @@ const showLightbox = ref(false);
 const currentImageIndex = ref(0);
 const isZoomed = ref(false);
 
+const showMetadataModal = ref(false);
+
 // Estados para la gestión de medios limitados
 const displayedMedia = computed(() => record.value?.media_items?.slice(0, 2) || []);
 const hasMoreMedia = computed(() => (record.value?.media_items?.length || 0) > 2);
@@ -198,7 +260,7 @@ const fetchDetail = async () => {
           const res = await axios.get(`/api/glam/record/${id}`, {
                params: {
                     with_labels: 1,
-                    fields: 'id,title,description,canonical_joined_metadata,thumbnail,collections.id,collections.title,media_items.id,media_items.path,media_items.thumbnail,media_items.title'
+                    fields: 'id,title,description,canonical_joined_metadata,joined_metadata,thumbnail,collections.id,collections.title,media_items.id,media_items.path,media_items.thumbnail,media_items.title,identifier,language,metadata'
                }
           });
 
@@ -258,6 +320,14 @@ const closeLightbox = () => {
 };
 
 /**
+ * Gestiona el modal de metadatos detallados.
+ */
+const closeMetadataModal = () => {
+     showMetadataModal.value = false;
+     document.body.style.overflow = '';
+};
+
+/**
  * Alterna dinámicamente el estado de zoom (acercamiento) de la imagen proyectada.
  */
 const toggleZoom = () => {
@@ -289,10 +359,13 @@ const prevImage = () => {
  * Gestor global de teclado para facilitar la navegación rápida y el cierre mediante atajos estándar.
  */
 const handleKeydown = (e) => {
-     if (!showLightbox.value) return;
-     if (e.key === 'Escape') closeLightbox();
+     if (!showLightbox.value && !showMetadataModal.value) return;
      if (e.key === 'ArrowRight') nextImage();
      if (e.key === 'ArrowLeft') prevImage();
+     if (e.key === 'Escape') {
+          if (showLightbox.value) closeLightbox();
+          if (showMetadataModal.value) closeMetadataModal();
+     }
 };
 
 onMounted(() => {
@@ -627,6 +700,42 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
      box-shadow: var(--shadow-sm);
 }
 
+.metadata-header {
+     display: flex;
+     justify-content: space-between;
+     align-items: flex-start;
+     margin-bottom: 2rem;
+     border-bottom: 1px solid var(--border-color);
+     padding-bottom: 0.5rem;
+}
+
+.metadata-header .section-label {
+     margin-bottom: 0;
+     border-bottom: none;
+     padding-bottom: 0;
+}
+
+.btn-info-detail {
+     display: flex;
+     align-items: center;
+     gap: 0.5rem;
+     color: var(--primary-color);
+     font-size: var(--fs-xs);
+     font-weight: 700;
+     text-transform: uppercase;
+     letter-spacing: 0.1em;
+     background: rgba(var(--primary-color-rgb), 0.05);
+     padding: 0.5rem 0.8rem;
+     border-radius: var(--radius-md);
+     transition: all 0.3s;
+}
+
+.btn-info-detail:hover {
+     background: var(--primary-color);
+     color: #fff;
+     transform: translateY(-2px);
+}
+
 .metadata-list {
      display: grid;
      gap: 1.5rem;
@@ -881,6 +990,234 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
      .is-zoomed {
           transform: scale(1.1);
           /* Zoom reducido en móviles para evitar recortes excesivos */
+     }
+}
+/* Metadata Modal Styles */
+.metadata-modal-overlay {
+     position: fixed;
+     inset: 0;
+     background: rgba(0, 0, 0, 0.7);
+     backdrop-filter: blur(10px);
+     z-index: 10000;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     padding: 1rem;
+}
+
+.metadata-modal {
+     background: var(--surface-color);
+     width: 100%;
+     max-width: 800px;
+     max-height: 90vh;
+     border-radius: var(--radius-xl);
+     box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+     display: flex;
+     flex-direction: column;
+     border: 1px solid rgba(255, 255, 255, 0.1);
+     animation: modalSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+     position: relative;
+     overflow: hidden;
+}
+
+@keyframes modalSlideUp {
+     from { transform: translateY(40px); opacity: 0; }
+     to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+     padding: 1.5rem 2rem;
+     border-bottom: 1px solid var(--border-color);
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     flex-shrink: 0;
+}
+
+.modal-header h2 {
+     margin: 0;
+     font-size: var(--fs-xl);
+     color: var(--text-primary);
+     font-weight: 800;
+}
+
+.modal-close {
+     background: var(--surface-card);
+     border: 1px solid var(--border-color);
+     color: var(--text-secondary);
+     border-radius: var(--radius-full);
+     width: 38px;
+     height: 38px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     transition: all 0.3s;
+     cursor: pointer;
+}
+
+.modal-close:hover {
+     background: var(--primary-color);
+     color: #fff;
+     border-color: var(--primary-color);
+     transform: rotate(90deg);
+}
+
+.modal-body {
+     padding: 2rem;
+     overflow-y: auto;
+     flex: 1;
+     scrollbar-width: thin;
+     scrollbar-color: var(--primary-color) transparent;
+}
+
+.modal-section {
+     margin-bottom: 3rem;
+}
+
+.modal-subtitle {
+     font-size: var(--fs-xs);
+     text-transform: uppercase;
+     letter-spacing: 0.15em;
+     color: var(--primary-color);
+     margin-bottom: 1.5rem;
+     font-weight: 800;
+     display: flex;
+     align-items: center;
+     gap: 0.8rem;
+}
+
+.modal-subtitle::after {
+     content: '';
+     flex: 1;
+     height: 1px;
+     background: var(--border-color);
+}
+
+.system-meta-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+     gap: 1.2rem;
+}
+
+.system-meta-item {
+     background: var(--surface-card);
+     padding: 1.2rem;
+     border-radius: var(--radius-lg);
+     border: 1px solid var(--border-color);
+     transition: all 0.3s;
+}
+
+.system-meta-item:hover {
+     border-color: var(--primary-color);
+     transform: translateY(-2px);
+}
+
+.system-meta-label {
+     font-size: 10px;
+     text-transform: uppercase;
+     color: var(--text-muted);
+     margin-bottom: 0.5rem;
+     font-weight: 700;
+     letter-spacing: 0.05em;
+}
+
+.system-meta-value {
+     font-size: 0.95rem;
+     font-weight: 600;
+     color: var(--text-primary);
+     word-break: break-all;
+     line-height: 1.4;
+}
+
+.full-metadata-list {
+     display: flex;
+     flex-direction: column;
+     gap: 0.5rem;
+}
+
+.full-metadata-item {
+     display: grid;
+     grid-template-columns: 240px 1fr;
+     gap: 2rem;
+     padding: 1.2rem;
+     border-radius: var(--radius-md);
+     transition: background 0.2s;
+}
+
+.full-metadata-item:nth-child(odd) {
+     background: rgba(var(--primary-color-rgb), 0.02);
+}
+
+.full-metadata-item:hover {
+     background: rgba(var(--primary-color-rgb), 0.05);
+}
+
+.full-metadata-label {
+     font-size: var(--fs-xs);
+     font-weight: 800;
+     color: var(--text-muted);
+     text-transform: uppercase;
+     letter-spacing: 0.05em;
+}
+
+.full-metadata-value {
+     font-size: 1rem;
+     color: var(--text-primary);
+     line-height: 1.6;
+}
+
+/* RESPONSIVIDAD AVANZADA */
+@media (max-width: 900px) {
+     .full-metadata-item {
+          grid-template-columns: 180px 1fr;
+          gap: 1.5rem;
+     }
+}
+
+@media (max-width: 768px) {
+    .metadata-modal-overlay {
+        padding: 0;
+    }
+
+     .metadata-modal {
+          max-height: 100vh;
+          border-radius: 0;
+          height: 100%;
+     }
+     
+     .modal-header {
+          padding: 1.2rem 1.5rem;
+     }
+
+     .modal-body {
+          padding: 1.5rem;
+     }
+
+     .full-metadata-item {
+          grid-template-columns: 1fr;
+          gap: 0.5rem;
+          padding: 1rem 0;
+          border-radius: 0;
+          border-bottom: 1px solid var(--border-color);
+          background: transparent !important;
+     }
+
+     .full-metadata-label {
+          font-size: 10px;
+     }
+
+     .modal-section {
+          margin-bottom: 2rem;
+     }
+}
+
+@media (max-width: 480px) {
+     .system-meta-grid {
+          grid-template-columns: 1fr;
+     }
+
+     .modal-header h2 {
+          font-size: 1.2rem;
      }
 }
 </style>
