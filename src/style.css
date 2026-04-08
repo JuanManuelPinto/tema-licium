@@ -361,3 +361,106 @@ button {
           grid-template-columns: 1fr;
      }
 }
+
+/* --- METADATA ENRICHMENT STYLES --- */
+.metadata-values-container {
+     display: flex;
+     flex-direction: column;
+     gap: 0.6rem;
+}
+
+.metadata-value-entry {
+     display: flex;
+     align-items: center;
+     flex-wrap: wrap;
+     gap: 0.6rem;
+}
+
+.type-badge {
+     font-size: 0.6rem;
+     font-weight: 800;
+     text-transform: uppercase;
+     padding: 0.25rem 0.6rem;
+     border-radius: 4px;
+     background: var(--border-color);
+     color: var(--text-muted);
+     letter-spacing: 0.05em;
+     line-height: 1;
+     white-space: nowrap;
+     border: 1px solid transparent;
+}
+
+.type-uri { 
+     background: rgba(var(--primary-color-rgb), 0.08); 
+     color: var(--primary-color);
+     border-color: rgba(var(--primary-color-rgb), 0.2);
+}
+
+.type-authority { 
+     background: #f3e5f5; 
+     color: #7b1fa2; 
+     border-color: rgba(123, 31, 162, 0.2);
+}
+
+.type-record { 
+     background: #e8f5e9; 
+     color: #2e7d32; 
+     border-color: rgba(46, 125, 50, 0.2);
+}
+
+.type-collection { 
+     background: #fff3e0; 
+     color: #ef6c00; 
+     border-color: rgba(239, 108, 0, 0.2);
+}
+
+.type-resource, .type-recurso { 
+     background: #e1f5fe; 
+     color: #0288d1; 
+     border-color: rgba(2, 136, 209, 0.2);
+}
+
+.type-vocabulary, .type-vocabulario { 
+     background: #f1f8e9; 
+     color: #558b2f; 
+     border-color: rgba(85, 139, 47, 0.2);
+}
+
+.type-literal { 
+     background: #fafafa; 
+     color: #616161; 
+     border-color: rgba(0, 0, 0, 0.05);
+}
+
+.type-uri-resource, .type-uri-recurso { 
+     background: #e0f2f1; 
+     color: #00796b; 
+     border-color: rgba(0, 121, 107, 0.2);
+}
+
+.meta-link {
+     color: var(--primary-color);
+     text-decoration: underline;
+     text-underline-offset: 3px;
+     text-decoration-thickness: 1px;
+     transition: all 0.2s;
+     font-weight: 600;
+     word-break: break-all;
+}
+
+.meta-link:hover {
+     color: var(--text-primary);
+     text-decoration-thickness: 2px;
+}
+
+.authority-value {
+     font-weight: 700;
+     color: var(--text-primary);
+     border-bottom: 2px solid rgba(123, 31, 162, 0.1);
+}
+
+.vocabulary-value {
+     font-weight: 600;
+     color: var(--text-secondary);
+     font-style: italic;
+}

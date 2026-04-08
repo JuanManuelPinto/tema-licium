@@ -62,15 +62,16 @@
                                    <div class="gallery-section" v-if="record.media_items?.length">
                                         <h3 class="section-label">Galería de Imágenes</h3>
                                         <div class="gallery-scroll">
-                                             <div v-for="(m, idx) in displayedMedia" :key="m.id"
-                                                  class="gallery-thumb" :class="{ 'active': isSelected(m) }"
-                                                  @click="setMainImage(m)">
+                                             <div v-for="(m, idx) in displayedMedia" :key="m.id" class="gallery-thumb"
+                                                  :class="{ 'active': isSelected(m) }" @click="setMainImage(m)">
                                                   <img :src="getThumbnail(m.thumbnail || m.path, 'small')"
                                                        :alt="m.title || 'Miniatura'" />
                                              </div>
-                                             
+
                                              <!-- Botón Ver más si hay más de 2 medios -->
-                                             <router-link v-if="hasMoreMedia" :to="{ name: 'record-media', params: { id: record.id } }" class="btn-more-media">
+                                             <router-link v-if="hasMoreMedia"
+                                                  :to="{ name: 'record-media', params: { id: record.id } }"
+                                                  class="btn-more-media">
                                                   <div class="more-content">
                                                        <span>+{{ record.media_items.length - 2 }}</span>
                                                        <small>Ver todos</small>
@@ -93,8 +94,10 @@
                               <div class="metadata-card" v-if="record.canonical_joined_metadata">
                                    <div class="metadata-header">
                                         <h3 class="section-label">Ficha Técnica</h3>
-                                        <button @click="showMetadataModal = true" class="btn-info-detail" title="Ver metadatos completos">
-                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <button @click="showMetadataModal = true" class="btn-info-detail"
+                                             title="Ver metadatos completos">
+                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                                  stroke="currentColor" stroke-width="2.5">
                                                   <circle cx="12" cy="12" r="10" />
                                                   <path d="M12 16v-4" />
                                                   <path d="M12 8h.01" />
@@ -107,7 +110,35 @@
                                              <div class="metadata-item" v-if="meta.values?.length">
                                                   <div class="metadata-label">{{ meta.label || key }}</div>
                                                   <div class="metadata-value">
-                                                       {{meta.values.map(v => formatValue(v)).join(', ')}}
+                                                       <div class="metadata-values-container">
+                                                            <div v-for="(v, index) in meta.values" :key="index"
+                                                                 class="metadata-value-entry">
+                                                                 <span v-if="v.type" class="type-badge"
+                                                                      :class="'type-' + v.type">{{ v.type }}</span>
+                                                                 <span class="value-content">
+                                                                      <template v-if="v.type === 'uri'">
+                                                                           <a :href="v.value || v['@id']"
+                                                                                target="_blank" class="meta-link">{{
+                                                                                     formatValue(v) }}</a>
+                                                                      </template>
+                                                                      <template
+                                                                           v-else-if="(v.type === 'record' || v.type === 'collection') && v.id">
+                                                                           <router-link
+                                                                                :to="{ name: v.type === 'record' ? 'record-detail' : 'collection-detail', params: { id: v.id } }"
+                                                                                class="meta-link">
+                                                                                {{ formatValue(v) }}
+                                                                           </router-link>
+                                                                      </template>
+                                                                      <template v-else-if="v.type === 'authority'">
+                                                                           <span class="authority-value">{{
+                                                                                formatValue(v) }}</span>
+                                                                      </template>
+                                                                      <template v-else>
+                                                                           {{ formatValue(v) }}
+                                                                      </template>
+                                                                 </span>
+                                                            </div>
+                                                       </div>
                                                   </div>
                                              </div>
                                         </template>
@@ -171,27 +202,33 @@
                                    <header class="modal-header">
                                         <h2>Detalles del Registro</h2>
                                         <button class="modal-close" @click="closeMetadataModal" title="Cerrar">
-                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                                  stroke="currentColor" stroke-width="2.5">
                                                   <path d="M18 6 6 18M6 6l12 12" />
                                              </svg>
                                         </button>
                                    </header>
-                                   
+
                                    <div class="modal-body">
                                         <div class="modal-section" v-if="record">
                                              <h3 class="modal-subtitle">Identificación del Registro</h3>
                                              <div class="system-meta-grid">
-                                                  <div class="system-meta-item" v-if="record.identifier || record.metadata?.identifier">
+                                                  <div class="system-meta-item"
+                                                       v-if="record.identifier || record.metadata?.identifier">
                                                        <div class="system-meta-label">Identificador</div>
-                                                       <div class="system-meta-value">{{ formatValue(record.identifier || record.metadata?.identifier) }}</div>
+                                                       <div class="system-meta-value">{{ formatValue(record.identifier
+                                                            ||
+                                                            record.metadata?.identifier) }}</div>
                                                   </div>
                                                   <div class="system-meta-item" v-if="record.id">
                                                        <div class="system-meta-label">ID Sistema</div>
                                                        <div class="system-meta-value">{{ record.id }}</div>
                                                   </div>
-                                                  <div class="system-meta-item" v-if="record.language || record.metadata?.language">
+                                                  <div class="system-meta-item"
+                                                       v-if="record.language || record.metadata?.language">
                                                        <div class="system-meta-label">Idioma</div>
-                                                       <div class="system-meta-value">{{ formatValue(record.language || record.metadata?.language) }}</div>
+                                                       <div class="system-meta-value">{{ formatValue(record.language ||
+                                                            record.metadata?.language) }}</div>
                                                   </div>
                                              </div>
                                         </div>
@@ -199,10 +236,63 @@
                                         <div class="modal-section" v-if="record.joined_metadata">
                                              <h3 class="modal-subtitle">Ficha Técnica Completa</h3>
                                              <div class="full-metadata-list">
-                                                  <div v-for="(meta, key) in record.joined_metadata" :key="key" class="full-metadata-item">
+                                                  <div v-for="(meta, key) in record.joined_metadata" :key="key"
+                                                       class="full-metadata-item">
                                                        <div class="full-metadata-label">{{ meta.label || key }}</div>
                                                        <div class="full-metadata-value">
-                                                            {{meta.values?.map(v => formatValue(v)).join(', ') || '—'}}
+                                                            <div class="metadata-values-container"
+                                                                 v-if="meta.values?.length">
+                                                                 <div v-for="(v, index) in meta.values" :key="index"
+                                                                      class="metadata-value-entry">
+                                                                      <span v-if="v.type" class="type-badge"
+                                                                           :class="'type-' + v.type.replace('.', '-')">{{
+                                                                                v.type
+                                                                           }}</span>
+                                                                      <span class="value-content">
+                                                                           <template
+                                                                                v-if="v.type === 'uri' || v.type === 'uri.resource' || v.type === 'uri.recurso'">
+                                                                                <a :href="v.value || v['@id']"
+                                                                                     target="_blank"
+                                                                                     class="meta-link">{{ formatValue(v)
+                                                                                     }}</a>
+                                                                           </template>
+                                                                           <template
+                                                                                v-else-if="(v.type === 'record' || v.type === 'collection' || v.type === 'resource' || v.type === 'recurso') && v.id">
+                                                                                <router-link
+                                                                                     :to="{ name: (v.type === 'record' || v.type === 'resource' || v.type === 'recurso') ? 'record-detail' : 'collection-detail', params: { id: v.id } }"
+                                                                                     class="meta-link">
+                                                                                     {{ formatValue(v) }}
+                                                                                </router-link>
+                                                                           </template>
+                                                                           <template
+                                                                                v-else-if="v.type === 'authority' || v.type === 'autoridad'">
+                                                                                <a v-if="v.uri || v['@id'] || (v.value && v.value.toString().startsWith('http'))"
+                                                                                     :href="v.uri || v['@id'] || v.value"
+                                                                                     target="_blank"
+                                                                                     class="meta-link authority-link">
+                                                                                     {{ formatValue(v) }}
+                                                                                </a>
+                                                                                <span v-else class="authority-value">{{
+                                                                                     formatValue(v) }}</span>
+                                                                           </template>
+                                                                           <template
+                                                                                v-else-if="v.type === 'vocabulary' || v.type === 'vocabulario'">
+                                                                                <a v-if="v.uri || v['@id'] || (v.value && v.value.toString().startsWith('http'))"
+                                                                                     :href="v.uri || v['@id'] || v.value"
+                                                                                     target="_blank"
+                                                                                     class="meta-link vocabulary-link">
+                                                                                     {{ formatValue(v) }}
+                                                                                </a>
+                                                                                <span v-else class="vocabulary-value">{{
+                                                                                     formatValue(v) }}</span>
+                                                                           </template>
+                                                                           <template v-else>
+                                                                                {{ formatValue(v) }}
+                                                                           </template>
+                                                                      </span>
+                                                                 </div>
+                                                            </div>
+                                                            <template v-else>—</template>
                                                        </div>
                                                   </div>
                                              </div>
@@ -992,6 +1082,7 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
           /* Zoom reducido en móviles para evitar recortes excesivos */
      }
 }
+
 /* Metadata Modal Styles */
 .metadata-modal-overlay {
      position: fixed;
@@ -1021,8 +1112,15 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
 }
 
 @keyframes modalSlideUp {
-     from { transform: translateY(40px); opacity: 0; }
-     to { transform: translateY(0); opacity: 1; }
+     from {
+          transform: translateY(40px);
+          opacity: 0;
+     }
+
+     to {
+          transform: translateY(0);
+          opacity: 1;
+     }
 }
 
 .modal-header {
@@ -1175,16 +1273,16 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
 }
 
 @media (max-width: 768px) {
-    .metadata-modal-overlay {
-        padding: 0;
-    }
+     .metadata-modal-overlay {
+          padding: 0;
+     }
 
      .metadata-modal {
           max-height: 100vh;
           border-radius: 0;
           height: 100%;
      }
-     
+
      .modal-header {
           padding: 1.2rem 1.5rem;
      }

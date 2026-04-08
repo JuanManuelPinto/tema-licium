@@ -97,7 +97,39 @@
                                         <div v-for="(meta, key) in collection.joined_metadata" :key="key" class="full-metadata-item">
                                              <div class="full-metadata-label">{{ meta.label || key }}</div>
                                              <div class="full-metadata-value">
-                                                  {{meta.values?.map(v => formatValue(v)).join(', ') || '—'}}
+                                                  <div class="metadata-values-container" v-if="meta.values?.length">
+                                                        <div v-for="(v, index) in meta.values" :key="index" class="metadata-value-entry">
+                                                             <span v-if="v.type" class="type-badge" :class="'type-' + v.type.replace('.', '-')">{{ v.type }}</span>
+                                                             <span class="value-content">
+                                                                  <template v-if="v.type === 'uri' || v.type === 'uri.resource' || v.type === 'uri.recurso'">
+                                                                       <a :href="v.value || v['@id']" target="_blank" class="meta-link">{{ formatValue(v) }}</a>
+                                                                  </template>
+                                                                  <template v-else-if="(v.type === 'record' || v.type === 'collection' || v.type === 'resource' || v.type === 'recurso') && v.id">
+                                                                       <router-link :to="{ name: (v.type === 'record' || v.type === 'resource' || v.type === 'recurso') ? 'record-detail' : 'collection-detail', params: { id: v.id } }" class="meta-link" @click="closeMetadataModal">
+                                                                            {{ formatValue(v) }}
+                                                                       </router-link>
+                                                                  </template>
+                                                                  <template v-else-if="v.type === 'authority' || v.type === 'autoridad'">
+                                                                       <a v-if="v.uri || v['@id'] || (v.value && v.value.toString().startsWith('http'))" 
+                                                                          :href="v.uri || v['@id'] || v.value" target="_blank" class="meta-link authority-link">
+                                                                            {{ formatValue(v) }}
+                                                                       </a>
+                                                                       <span v-else class="authority-value">{{ formatValue(v) }}</span>
+                                                                  </template>
+                                                                  <template v-else-if="v.type === 'vocabulary' || v.type === 'vocabulario'">
+                                                                       <a v-if="v.uri || v['@id'] || (v.value && v.value.toString().startsWith('http'))" 
+                                                                          :href="v.uri || v['@id'] || v.value" target="_blank" class="meta-link vocabulary-link">
+                                                                            {{ formatValue(v) }}
+                                                                       </a>
+                                                                       <span v-else class="vocabulary-value">{{ formatValue(v) }}</span>
+                                                                  </template>
+                                                                  <template v-else>
+                                                                       {{ formatValue(v) }}
+                                                                  </template>
+                                                             </span>
+                                                        </div>
+                                                   </div>
+                                                   <template v-else>—</template>
                                              </div>
                                         </div>
                                    </div>
