@@ -20,7 +20,7 @@
                          <h3 class="footer-heading">Navegación</h3>
                          <ul class="footer-list">
                               <li><router-link to="/">Inicio</router-link></li>
-                              <li><router-link to="/explore">Registros</router-link></li>
+                              <li><router-link to="/records">Registros</router-link></li>
                               <li><router-link to="/collections">Colecciones</router-link></li>
                               <li><router-link to="/search">Buscador</router-link></li>
                          </ul>

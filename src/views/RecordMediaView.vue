@@ -27,8 +27,17 @@
             </svg>
           </div>
         </div>
-        <div class="media-info" v-if="m.title">
-          <h3 class="media-title">{{ m.title }}</h3>
+        <div class="media-info">
+          <h3 class="media-title" v-if="m.title">{{ m.title }}</h3>
+          <div class="media-actions-row">
+            <router-link :to="{ name: 'media-detail', params: { id: getId(m) }, query: { from: route.fullPath } }"
+              class="btn-media-detail" @click.stop>
+              Ver detalles
+            </router-link>
+            <a v-if="isPdf(m)" :href="getOriginalUrl(m)" target="_blank" class="btn-view-pdf" @click.stop>
+              Ver PDF
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -87,7 +96,9 @@ const fetchRecord = async () => {
   try {
     const id = route.params.id;
     const res = await axios.get(`/api/glam/record/${id}`, {
-      params: { fields: 'id,title,media_items.id,media_items.path,media_items.thumbnail,media_items.title' }
+      params: {
+        fields: 'id,title,media_items.id,media_items.path,media_items.thumbnail,media_items.title,media_items.mimetype,media_items.extension,media_items.attachment'
+      }
     });
     record.value = res.data.item || res.data;
   } catch (e) {
@@ -97,11 +108,80 @@ const fetchRecord = async () => {
   }
 };
 
-const getThumbnail = (path, size = 'large') => {
+const ensureString = (val) => {
+  if (val === null || val === undefined) return '';
+  if (typeof val === 'string') return val;
+  if (Array.isArray(val)) return val.length > 0 ? ensureString(val[0]) : '';
+  if (typeof val === 'object') {
+    const candidate = val.translated_label || val.label || val.value || val['@id'] || val.uri || val.id || val.filename || '';
+    return typeof candidate === 'string' ? candidate : ensureString(candidate);
+  }
+  return String(val);
+};
+
+const getThumbnail = (rawPath, size = 'large') => {
+  const path = ensureString(rawPath);
   if (!path) return '';
   const domain = 'https://arcadium.cluster24.libnamic.eu';
   let full = path.startsWith('http') ? path : `${domain}${path}`;
   return full.replace(/size=\w+/, `size=${size}`);
+};
+
+const isPdf = (m) => {
+  if (!m) return false;
+  // Comprobar mimetype y extensión tanto en el nivel superior como dentro de attachment
+  const mime = (ensureString(m.mimetype) || ensureString(m.attachment?.mimetype) || '').toLowerCase();
+  const ext = (ensureString(m.extension) || ensureString(m.attachment?.extension) || '').toLowerCase();
+  const attachmentStr = ensureString(m.attachment).toLowerCase();
+  const path = ensureString(m.path).toLowerCase();
+  const thumb = ensureString(m.thumbnail).toLowerCase();
+  const title = ensureString(m.title).toLowerCase();
+
+  return mime.includes('pdf') ||
+    ext.includes('pdf') ||
+    attachmentStr.includes('.pdf') ||
+    path.includes('.pdf') ||
+    thumb.includes('.pdf') ||
+    title.includes('.pdf');
+};
+
+const getOriginalUrl = (m) => {
+  if (!m) return '#';
+  const domain = 'https://arcadium.cluster24.libnamic.eu';
+
+  // 1. Prioridad: URL directa del adjunto si está disponible en la respuesta
+  const attachmentUrl = m.attachment?.url || m.url;
+  if (attachmentUrl && typeof attachmentUrl === 'string') {
+    return attachmentUrl.startsWith('http') ? attachmentUrl : `${domain}${attachmentUrl}`;
+  }
+
+  // 2. Prioridad: ID específico del adjunto (distinto del ID del medio)
+  const attachmentId = m.attachment?.id || m.attachment_id;
+  if (attachmentId) {
+    return `${domain}/api/core/attachment/action_get/file?attachment_id=${attachmentId}`;
+  }
+
+  // 3. Fallback: ID del medio (para compatibilidad)
+  const mediaId = getId(m);
+  if (mediaId && mediaId !== '#') {
+    return `${domain}/api/core/attachment/action_get/file?attachment_id=${mediaId}`;
+  }
+
+  // 4. Último recurso: Resolver por rutas
+  const path = ensureString(m.path || m.thumbnail);
+  if (!path || path === '#') return '#';
+  const separator = path.startsWith('http') || path.startsWith('/') ? '' : '/';
+  return path.startsWith('http') ? path : `${domain}${separator}${path}`;
+};
+
+const getId = (m) => {
+  const rawId = m.id || m['@id'];
+  if (!rawId) return null;
+  if (typeof rawId === 'string' && rawId.includes('/')) {
+    const parts = rawId.split('/');
+    return parts[parts.length - 1];
+  }
+  return rawId;
 };
 
 const openLightbox = (index) => {
@@ -231,14 +311,45 @@ onUnmounted(() => {
   padding: 0.75rem 1rem;
 }
 
+.media-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .media-title {
   font-size: 0.8rem;
   font-weight: 600;
-  margin: 0;
+  margin: 0 0 0.5rem 0;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.btn-media-detail,
+.btn-view-pdf {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: all 0.3s;
+}
+
+.btn-media-detail {
+  color: var(--primary-color);
+}
+
+.btn-view-pdf {
+  color: #e74c3c;
+}
+
+.btn-media-detail:hover,
+.btn-view-pdf:hover {
+  color: var(--text-primary);
+  text-underline-offset: 4px;
 }
 
 @media (max-width: 768px) {

@@ -79,13 +79,13 @@
                         <h2 class="title-lg">Últimos Registros</h2>
                         <p class="subtitle">Registros añadidos recientemente.</p>
                     </div>
-                    <router-link to="/explore" class="link-more">Explorar catálogo →</router-link>
+                    <router-link to="/records" class="link-more">Explorar catálogo →</router-link>
                 </div>
 
                 <div v-if="loading" class="loading-wrapper"><span class="loader"></span></div>
                 <div v-else class="tiles-grid">
                     <router-link v-for="record in records" :key="record.id"
-                        :to="{ name: 'record-detail', params: { id: record.id } }" class="visual-tile"
+                        :to="{ name: 'record-detail', params: { id: getId(record.id) } }" class="visual-tile"
                         :class="{ 'no-thumb': !record.thumbnail }">
                         <img v-if="record.thumbnail" :src="getLargeThumb(record.thumbnail)" alt="" class="tile-img" />
                         <div class="tile-overlay"></div>
@@ -145,6 +145,25 @@ const getLargeThumb = (path) => {
  * Utilidad para truncar textos largos de descripciones para mantener
  * la consistencia en el diseño de las tarjetas.
  */
+const formatValue = (val) => {
+     if (!val) return '—';
+     if (typeof val !== 'object') return val;
+     return val.translated_label || val.label || val['@value'] || val.value || JSON.stringify(val);
+};
+
+const getId = (val) => {
+     if (!val) return null;
+     // Si recibimos un array, tomamos el primer elemento (corrige crash de Vue Router)
+     const rawId = Array.isArray(val) ? val[0] : val;
+     if (!rawId) return null;
+     
+     if (typeof rawId === 'string' && rawId.includes('/')) {
+          const parts = rawId.split('/');
+          return parts[parts.length - 1];
+     }
+     return rawId;
+};
+
 const truncate = (str, len) => {
     if (!str) return '';
     return str.length > len ? str.substring(0, len) + '...' : str;

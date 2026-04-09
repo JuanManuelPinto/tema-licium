@@ -20,7 +20,7 @@
                          <!-- Enlaces de navegación -->
                          <div class="nav-links-wrapper">
                               <router-link to="/" class="nav-link" active-class="active">Inicio</router-link>
-                              <router-link to="/explore" class="nav-link" active-class="active">Registros</router-link>
+                               <router-link to="/records" class="nav-link" active-class="active">Registros</router-link>
                               <router-link to="/collections" class="nav-link"
                                    active-class="active">Colecciones</router-link>
                               <router-link to="/search" class="nav-link" active-class="active">Buscador</router-link>

@@ -2,16 +2,22 @@
      <!-- Tarjeta versátil diseñada para mostrar tanto registros individuales como colecciones -->
      <router-link :to="link" :class="['card-item', `view-${viewMode}`, { 'is-reverse': reverse }]">
 
-           <!-- Contenedor de medios: gestión de miniaturas y estados vacíos -->
-           <div class="card-media">
-                <img v-if="item.thumbnail" :src="thumbUrl" :alt="item.title" class="card-img" loading="lazy" />
-                <div v-else class="card-no-img">
-                     <span>{{ typeLabel }}</span>
-                </div>
+          <!-- Contenedor de medios: gestión de miniaturas y estados vacíos -->
+          <div class="card-media">
+               <img v-if="item.thumbnail" :src="thumbUrl" :alt="item.title" class="card-img" loading="lazy" />
+               <div v-else class="card-no-img">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                         opacity="0.4">
+                         <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                         <circle cx="9" cy="9" r="2" />
+                         <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                    </svg>
+                    <span>{{ typeLabel }}</span>
+               </div>
 
-                <!-- Etiqueta flotante que indica la tipografía del elemento (solo si hay imagen) -->
-                <div class="card-badge" v-if="item.thumbnail">{{ typeLabel }}</div>
-           </div>
+               <!-- Etiqueta flotante que indica la tipografía del elemento (solo si hay imagen) -->
+               <div class="card-badge" v-if="item.thumbnail">{{ typeLabel }}</div>
+          </div>
 
           <!-- Bloque de información: título, descripción condensada y llamada a la acción -->
           <div class="card-body">
@@ -116,14 +122,17 @@ const thumbUrl = computed(() => {
      width: 100%;
      height: 100%;
      display: flex;
+     flex-direction: column;
      align-items: center;
      justify-content: center;
      background: var(--surface-color);
      color: var(--text-muted);
+     gap: 0.8rem;
      font-weight: 700;
      text-transform: uppercase;
      letter-spacing: 0.1em;
-     font-size: 0.8rem;
+     font-size: 0.7rem;
+     border: 1px dashed var(--border-color);
 }
 
 .card-img {
@@ -206,7 +215,8 @@ const thumbUrl = computed(() => {
 
 .view-list .card-body {
      justify-content: flex-start;
-     min-width: 0; /* clave en flex-row para permitir que el texto envuelva */
+     min-width: 0;
+     /* clave en flex-row para permitir que el texto envuelva */
      flex: 1 1 auto;
 }
 

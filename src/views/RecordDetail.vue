@@ -49,13 +49,65 @@
                          <div class="media-section">
                               <div class="sticky-media">
                                    <!-- Visualizador principal con trigger para el modo a pantalla completa -->
-                                   <div class="main-image-wrapper" @click="openLightbox"
-                                        title="Click para ver en grande">
-                                        <img v-if="selectedImage" :src="getThumbnail(selectedImage, 'large')"
-                                             class="main-img" alt="Imagen del registro" />
-                                        <img v-else-if="record.thumbnail" :src="getThumbnail(record.thumbnail, 'large')"
-                                             class="main-img" alt="Imagen del registro" />
-                                        <div v-else class="no-img-placeholder">Registro</div>
+                                   <div class="main-image-wrapper"
+                                        :class="{ 'is-pdf': isPdfSelected, 'no-click': !hasImage || isPdfSelected }"
+                                        @click="hasImage && !isPdfSelected && openLightbox"
+                                        :title="hasImage && !isPdfSelected ? 'Click para ver en grande' : ''">
+
+                                        <template v-if="hasImage">
+                                             <!-- Vista previa para documentos PDF -->
+                                             <div v-if="isPdfSelected" class="pdf-main-preview">
+                                                  <div class="pdf-icon-wrapper">
+                                                       <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="1.2">
+                                                            <path
+                                                                 d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                                            <polyline points="14 2 14 8 20 8" />
+                                                            <line x1="9" y1="13" x2="15" y2="13" />
+                                                            <line x1="9" y1="17" x2="15" y2="17" />
+                                                            <line x1="9" y1="9" x2="10" y2="9" />
+                                                       </svg>
+                                                  </div>
+                                                  <div class="pdf-actions">
+                                                       <span class="pdf-tag">Documento PDF</span>
+                                                       <router-link v-if="selectedMediaItem"
+                                                            :to="{ name: 'media-detail', params: { id: getId(selectedMediaItem) }, query: { from: route.fullPath } }"
+                                                            class="btn-view-doc">
+                                                            Abrir en visor interactivo
+                                                       </router-link>
+                                                  </div>
+                                             </div>
+
+                                             <!-- Visualización de imagen estándar -->
+                                             <img v-else :src="getThumbnail(selectedImage || record.thumbnail, 'large')"
+                                                  class="main-img" alt="Imagen del registro" />
+                                        </template>
+
+                                        <!-- Estado vacío: Sin medios disponibles -->
+                                        <div v-else class="no-img-placeholder">
+                                             <div class="no-img-icon">
+                                                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                                       stroke="currentColor" stroke-width="1.2">
+                                                       <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                                                       <circle cx="9" cy="9" r="2" />
+                                                       <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                                                  </svg>
+                                             </div>
+                                             <span>Sin material visual disponible</span>
+                                        </div>
+                                   </div>
+
+                                   <div v-if="record.media_items?.length" class="main-media-actions">
+                                        <router-link :to="{ name: 'record-media', params: { id: record.id } }"
+                                             class="btn-primary btn-media-view">
+                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                                  stroke="currentColor" stroke-width="2.5">
+                                                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                                                  <circle cx="9" cy="9" r="2" />
+                                                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                                             </svg>
+                                             Ver todos los medios ({{ record.media_items.length }})
+                                        </router-link>
                                    </div>
 
                                    <!-- Selector de galería para registros con múltiples elementos de medios -->
@@ -114,23 +166,55 @@
                                                             <div v-for="(v, index) in meta.values" :key="index"
                                                                  class="metadata-value-entry">
                                                                  <span v-if="v.type" class="type-badge"
-                                                                      :class="'type-' + v.type">{{ v.type }}</span>
+                                                                      :class="'type-' + v.type.replace('.', '-')">{{
+                                                                           v.type }}</span>
                                                                  <span class="value-content">
-                                                                      <template v-if="v.type === 'uri'">
-                                                                           <a :href="v.value || v['@id']"
+                                                                      <template
+                                                                           v-if="v.type === 'uri' || v.type === 'uri.resource' || v.type === 'uri.recurso'">
+                                                                           <a :href="v.uri || v['@id'] || v.value"
                                                                                 target="_blank" class="meta-link">{{
                                                                                      formatValue(v) }}</a>
                                                                       </template>
                                                                       <template
-                                                                           v-else-if="(v.type === 'record' || v.type === 'collection') && v.id">
+                                                                           v-else-if="getRouteName(v) && (v.id || v['@id'])">
                                                                            <router-link
-                                                                                :to="{ name: v.type === 'record' ? 'record-detail' : 'collection-detail', params: { id: v.id } }"
+                                                                                :to="{ name: getRouteName(v), params: { id: getId(v) }, query: { from: route.fullPath } }"
                                                                                 class="meta-link">
                                                                                 {{ formatValue(v) }}
                                                                            </router-link>
                                                                       </template>
-                                                                      <template v-else-if="v.type === 'authority'">
-                                                                           <span class="authority-value">{{
+                                                                      <template
+                                                                           v-else-if="v.type === 'authority' || v.type === 'autoridad'">
+                                                                            <div class="authority-wrapper">
+                                                                           <a v-if="v.uri || v['@id'] || (v.value && v.value.toString().startsWith('http'))"
+                                                                                :href="v.uri || v['@id'] || v.value"
+                                                                                target="_blank"
+                                                                                class="meta-link authority-link">
+                                                                                {{ formatValue(v) }}
+                                                                           </a>
+                                                                           <span v-else class="authority-value">{{
+                                                                                formatValue(v) }}</span>
+                                                                      
+                                                                                 <button v-if="getId(v)" @click="openAuthorityModal(getId(v))"
+                                                                                      class="btn-authority-info" title="Ver detalles de la autoridad">
+                                                                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                                                                           <circle cx="12" cy="12" r="10" />
+                                                                                           <path d="M12 16v-4" />
+                                                                                           <path d="M12 8h.01" />
+                                                                                      </svg>
+                                                                                      Detalles
+                                                                                 </button>
+                                                                            </div>
+                                                                       </template>
+                                                                      <template
+                                                                           v-else-if="v.type === 'vocabulary' || v.type === 'vocabulario'">
+                                                                           <a v-if="v.uri || v['@id'] || (v.value && v.value.toString().startsWith('http'))"
+                                                                                :href="v.uri || v['@id'] || v.value"
+                                                                                target="_blank"
+                                                                                class="meta-link vocabulary-link">
+                                                                                {{ formatValue(v) }}
+                                                                           </a>
+                                                                           <span v-else class="vocabulary-value">{{
                                                                                 formatValue(v) }}</span>
                                                                       </template>
                                                                       <template v-else>
@@ -251,21 +335,22 @@
                                                                       <span class="value-content">
                                                                            <template
                                                                                 v-if="v.type === 'uri' || v.type === 'uri.resource' || v.type === 'uri.recurso'">
-                                                                                <a :href="v.value || v['@id']"
+                                                                                <a :href="v.uri || v['@id'] || v.value"
                                                                                      target="_blank"
                                                                                      class="meta-link">{{ formatValue(v)
                                                                                      }}</a>
                                                                            </template>
                                                                            <template
-                                                                                v-else-if="(v.type === 'record' || v.type === 'collection' || v.type === 'resource' || v.type === 'recurso') && v.id">
+                                                                                v-else-if="getRouteName(v) && (v.id || v['@id'])">
                                                                                 <router-link
-                                                                                     :to="{ name: (v.type === 'record' || v.type === 'resource' || v.type === 'recurso') ? 'record-detail' : 'collection-detail', params: { id: v.id } }"
+                                                                                     :to="{ name: getRouteName(v), params: { id: getId(v) }, query: { from: route.fullPath } }"
                                                                                      class="meta-link">
                                                                                      {{ formatValue(v) }}
                                                                                 </router-link>
                                                                            </template>
                                                                            <template
                                                                                 v-else-if="v.type === 'authority' || v.type === 'autoridad'">
+                                                                            <div class="authority-wrapper">
                                                                                 <a v-if="v.uri || v['@id'] || (v.value && v.value.toString().startsWith('http'))"
                                                                                      :href="v.uri || v['@id'] || v.value"
                                                                                      target="_blank"
@@ -274,7 +359,18 @@
                                                                                 </a>
                                                                                 <span v-else class="authority-value">{{
                                                                                      formatValue(v) }}</span>
-                                                                           </template>
+                                                                           
+                                                                                 <button v-if="getId(v)" @click="openAuthorityModal(getId(v))"
+                                                                                      class="btn-authority-info" title="Ver detalles de la autoridad">
+                                                                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                                                                           <circle cx="12" cy="12" r="10" />
+                                                                                           <path d="M12 16v-4" />
+                                                                                           <path d="M12 8h.01" />
+                                                                                      </svg>
+                                                                                      Detalles
+                                                                                 </button>
+                                                                            </div>
+</template>
                                                                            <template
                                                                                 v-else-if="v.type === 'vocabulary' || v.type === 'vocabulario'">
                                                                                 <a v-if="v.uri || v['@id'] || (v.value && v.value.toString().startsWith('http'))"
@@ -294,6 +390,86 @@
                                                             </div>
                                                             <template v-else>—</template>
                                                        </div>
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+                    </Transition>
+               </Teleport>
+
+               <!-- Modal de Detalle de Autoridad (Persona/Entidad/Lugar) -->
+               <Teleport to="body">
+                    <Transition name="fade">
+                         <div v-if="showAuthorityModal" class="metadata-modal-overlay" @click.self="closeAuthorityModal">
+                              <div class="metadata-modal authority-modal-card">
+                                   <header class="modal-header">
+                                        <div class="modal-header-nav">
+                                             <button class="modal-close" @click="closeAuthorityModal" title="Cerrar">
+                                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                                       <path d="M18 6 6 18M6 6l12 12" />
+                                                  </svg>
+                                             </button>
+                                        </div>
+                                   </header>
+
+                                   <div class="modal-body">
+                                        <div v-if="authorityLoading" class="loading-wrapper auth-loading">
+                                             <span class="loader"></span>
+                                        </div>
+
+                                        <div v-else-if="selectedAuthority" class="authority-content">
+                                             <div class="authority-hero">
+                                                  <div class="authority-portrait">
+                                                       <img v-if="selectedAuthority.thumbnail" 
+                                                            :src="getThumbnail(selectedAuthority.thumbnail, 'large')" 
+                                                            :alt="selectedAuthority.title" />
+                                                       <div v-else class="authority-portrait-placeholder">
+                                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                                                                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+                                                            </svg>
+                                                       </div>
+                                                  </div>
+                                                  <div class="authority-main-info">
+                                                       <span class="authority-type-tag">Ficha de Autoridad</span>
+                                                       <h2 class="authority-name">{{ selectedAuthority.title }}</h2>
+                                                       <div v-if="selectedAuthority.metadata?.type" class="authority-subtitle">
+                                                            {{ formatValue(selectedAuthority.metadata.type) }}
+                                                       </div>
+                                                  </div>
+                                             </div>
+
+                                             <div class="authority-details">
+                                                  <template v-if="selectedAuthority.description || hasAuthorityLinks(selectedAuthority.metadata)">
+                                                       <div class="authority-section" v-if="selectedAuthority.description">
+                                                            <h3 class="modal-subtitle">Descripción</h3>
+                                                            <div class="authority-desc-text" v-html="selectedAuthority.description"></div>
+                                                       </div>
+
+                                                       <div class="authority-section" v-if="hasAuthorityLinks(selectedAuthority.metadata)">
+                                                            <h3 class="modal-subtitle">Enlaces e Identificadores</h3>
+                                                            <div class="authority-links-grid">
+                                                                 <template v-for="(v, k) in selectedAuthority.metadata" :key="k">
+                                                                      <a v-if="(k.includes('wikidata') || k.includes('wikipedia') || k.includes('viaf') || k.includes('isni') || k.includes('gnd') || k.includes('external')) && ensureString(v)"
+                                                                         :href="ensureString(v)" target="_blank" class="authority-link-item">
+                                                                           <div class="auth-link-icon" :style="{ backgroundColor: getAuthorityLinkColor(k) }">
+                                                                                {{ getAuthorityLinkIcon(k) }}
+                                                                           </div>
+                                                                           <div class="auth-link-details">
+                                                                                <span class="auth-link-label">{{ k }}</span>
+                                                                                <span class="auth-link-val">{{ ensureString(v) }}</span>
+                                                                           </div>
+                                                                      </a>
+                                                                 </template>
+                                                            </div>
+                                                       </div>
+                                                  </template>
+                                                  <div v-else class="no-authority-details">
+                                                       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.3; margin-bottom: 1rem;">
+                                                            <path d="M12 8v4" /><path d="M12 16h.01" /><circle cx="12" cy="12" r="10" />
+                                                       </svg>
+                                                       <p>No existen detalles adicionales para este medio.</p>
                                                   </div>
                                              </div>
                                         </div>
@@ -335,9 +511,74 @@ const isZoomed = ref(false);
 
 const showMetadataModal = ref(false);
 
+// Gestión del Modal de Autoridades (Personas, Entidades, etc.)
+const showAuthorityModal = ref(false);
+const authorityLoading = ref(false);
+const selectedAuthority = ref(null);
+
+const hasAuthorityLinks = (metadata) => {
+     if (!metadata) return false;
+     return Object.keys(metadata).some(k => 
+          k.includes('wikidata') || k.includes('wikipedia') || k.includes('viaf') || 
+          k.includes('isni') || k.includes('gnd') || k.includes('external')
+     );
+};
+
+/**
+ * Recupera y visualiza el detalle expandido de una autoridad desde el servicio core.
+ */
+const openAuthorityModal = async (id) => {
+     if (!id) return;
+     showAuthorityModal.value = true;
+     authorityLoading.value = true;
+     selectedAuthority.value = null;
+     document.body.style.overflow = 'hidden';
+
+     try {
+          const res = await axios.get(`/api/core/authority/${id}`, { params: { with_labels: 1 } });
+          selectedAuthority.value = res.data.item || res.data;
+     } catch (e) {
+          console.error("Error al recuperar detalle de la autoridad:", e);
+     } finally {
+          authorityLoading.value = false;
+     }
+};
+
+const closeAuthorityModal = () => {
+     showAuthorityModal.value = false;
+     document.body.style.overflow = '';
+};
+
 // Estados para la gestión de medios limitados
 const displayedMedia = computed(() => record.value?.media_items?.slice(0, 2) || []);
 const hasMoreMedia = computed(() => (record.value?.media_items?.length || 0) > 2);
+
+const selectedMediaItem = computed(() => {
+     if (!record.value || !selectedImage.value) return null;
+     return record.value.media_items?.find(m => (m.path || m.thumbnail) === selectedImage.value);
+});
+
+const hasImage = computed(() => {
+     return !!(selectedImage.value || record.value?.thumbnail);
+});
+
+const isPdfSelected = computed(() => {
+     const m = selectedMediaItem.value;
+     if (!m) return ensureString(selectedImage.value).toLowerCase().includes('.pdf');
+
+     const mime = (ensureString(m.mimetype) || ensureString(m.attachment?.mimetype) || '').toLowerCase();
+     const ext = (ensureString(m.extension) || ensureString(m.attachment?.extension) || '').toLowerCase();
+     const path = ensureString(m.path || m.thumbnail || m.attachment).toLowerCase();
+
+     return mime.includes('pdf') || ext.includes('pdf') || path.includes('.pdf');
+});
+
+const isCurrentPdf = computed(() => {
+     if (!record.value || !record.value.media_items) return false;
+     const m = record.value.media_items[currentImageIndex.value];
+     if (!m) return false;
+     return m.mimetype === 'application/pdf' || m.extension?.toLowerCase() === 'pdf' || m.path?.toLowerCase().endsWith('.pdf');
+});
 
 /**
  * Solicita los datos detallados del registro al servidor GLAM.
@@ -350,7 +591,7 @@ const fetchDetail = async () => {
           const res = await axios.get(`/api/glam/record/${id}`, {
                params: {
                     with_labels: 1,
-                    fields: 'id,title,description,canonical_joined_metadata,joined_metadata,thumbnail,collections.id,collections.title,media_items.id,media_items.path,media_items.thumbnail,media_items.title,identifier,language,metadata'
+                    fields: 'id,title,description,canonical_joined_metadata,joined_metadata,thumbnail,collections.id,collections.title,media_items.id,media_items.path,media_items.thumbnail,media_items.title,media_items.mimetype,media_items.extension,media_items.attachment,identifier,language,metadata'
                }
           });
 
@@ -467,25 +708,117 @@ onUnmounted(() => {
      window.removeEventListener('keydown', handleKeydown);
 });
 
+const getAuthorityLinkIcon = (key) => {
+     const k = key.toLowerCase();
+     if (k.includes('wikidata')) return 'WD';
+     if (k.includes('wikipedia')) return 'W';
+     if (k.includes('viaf')) return 'VIAF';
+     if (k.includes('isni')) return 'ISNI';
+     if (k.includes('gnd')) return 'GND';
+     if (k.includes('congress')) return 'LC';
+     return '🔗';
+};
+
+const getAuthorityLinkColor = (key) => {
+     const k = key.toLowerCase();
+     if (k.includes('wikidata')) return '#006699';
+     if (k.includes('wikipedia')) return '#333333';
+     if (k.includes('viaf')) return '#cc3333';
+     return 'var(--primary-color)';
+};
+
 /**
  * Normaliza los valores de metadatos complejos priorizando las etiquetas traducidas
  * para asegurar la legibilidad en entornos multilingües o dinámicos.
  */
 const formatValue = (val) => {
-     if (!val) return '';
+     if (!val) return '—';
      if (typeof val !== 'object') return val;
-     return val.translated_label || val.label || val['@value'] || val.value || val['@id'] || JSON.stringify(val);
+     return val.translated_label || val.label || val['@value'] || val.value || JSON.stringify(val);
+};
+
+const getId = (val) => {
+     if (!val) return null;
+     // Si recibimos un objeto de metadato, extraemos el id o @id
+     let rawId = (typeof val === 'object' && !Array.isArray(val)) ? (val.id || val['@id']) : val;
+
+     // Si aún así es un array, tomamos el primer elemento (corrige crash de Vue Router)
+     if (Array.isArray(rawId)) rawId = rawId[0];
+
+     if (!rawId) return null;
+     if (typeof rawId === 'string' && rawId.includes('/')) {
+          const parts = rawId.split('/');
+          return parts[parts.length - 1];
+     }
+     return rawId;
+};
+
+const getRouteName = (v) => {
+     if (!v) return null;
+     const type = typeof v === 'object' ? v.type : v;
+     const model = typeof v === 'object' ? (v.model || v.resource_type) : null;
+
+     if (model === 'glam.record') return 'record-detail';
+     if (model === 'glam.collection') return 'collection-detail';
+     if (model === 'glam.media') return 'media-detail';
+
+     if (type === 'record' || type === 'resource' || type === 'recurso') return 'record-detail';
+     if (type === 'collection' || type === 'coleccion') return 'collection-detail';
+     if (type === 'media' || type === 'medio') return 'media-detail';
+     return null;
 };
 
 /**
  * Resuelve la ruta absoluta de la imagen aplicando parámetros de optimización
  * para el CDN (tamaño y calidad).
  */
-const getThumbnail = (path, size = 'large') => {
+const ensureString = (val) => {
+     if (val === null || val === undefined) return '';
+     if (typeof val === 'string') return val;
+     if (Array.isArray(val)) return val.length > 0 ? ensureString(val[0]) : '';
+     if (typeof val === 'object') {
+          const candidate = val.translated_label || val.label || val.value || val['@id'] || val.uri || val.id || '';
+          return typeof candidate === 'string' ? candidate : ensureString(candidate);
+     }
+     return String(val);
+};
+
+const getThumbnail = (rawPath, size = 'large') => {
+     const path = ensureString(rawPath);
      if (!path) return '';
      const domain = 'https://arcadium.cluster24.libnamic.eu';
-     let full = path.startsWith('http') ? path : `${domain}${path}`;
+     const sep = path.startsWith('/') || path.startsWith('http') ? '' : '/';
+     let full = path.startsWith('http') ? path : `${domain}${sep}${path}`;
      return full.replace(/size=\w+/, `size=${size}`);
+};
+
+const getOriginalUrl = (m) => {
+     if (!m) return '#';
+     const domain = 'https://arcadium.cluster24.libnamic.eu';
+
+     // 1. Prioridad: URL directa del adjunto
+     const attachmentUrl = m.attachment?.url || m.url;
+     if (attachmentUrl && typeof attachmentUrl === 'string') {
+          return attachmentUrl.startsWith('http') ? attachmentUrl : `${domain}${attachmentUrl}`;
+     }
+
+     // 2. Prioridad: ID específico del adjunto
+     const attachmentId = m.attachment?.id || m.attachment_id;
+     if (attachmentId) {
+          return `${domain}/api/core/attachment/action_get/file?attachment_id=${attachmentId}`;
+     }
+
+     // 3. Fallback: ID del objeto media
+     const mediaId = (typeof m === 'object') ? getId(m) : null;
+     if (mediaId && mediaId !== '#') {
+          return `${domain}/api/core/attachment/action_get/file?attachment_id=${mediaId}`;
+     }
+
+     // 4. Resolver por rutas
+     const path = ensureString(m);
+     if (!path || path === '#') return '#';
+     const sep = path.startsWith('/') || path.startsWith('http') ? '' : '/';
+     return path.startsWith('http') ? path : `${domain}${sep}${path}`;
 };
 
 // Reinicia la carga de datos si el parámetro ID de la ruta cambia durante la sesión
@@ -630,8 +963,32 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.main-image-wrapper:hover {
-     transform: scale(1.02);
+.main-image-wrapper:hover .main-img {
+     transform: scale(1.05);
+}
+
+.main-media-actions {
+     margin-bottom: 2rem;
+}
+
+.btn-media-view {
+     width: 100%;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     gap: 0.75rem;
+     padding: 1rem;
+     font-size: var(--fs-xs);
+     letter-spacing: 0.1em;
+     background: var(--surface-card);
+     border: 1px solid var(--border-color);
+     color: var(--text-primary);
+}
+
+.btn-media-view:hover {
+     background: var(--bg-color);
+     border-color: var(--primary-color);
+     color: var(--primary-color);
 }
 
 .main-img {
@@ -1049,6 +1406,31 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
      border-radius: 10px 0 0 10px;
 }
 
+.pdf-viewer-compact {
+     width: 100%;
+     height: 100%;
+     border: none;
+     background: #f5f5f5;
+}
+
+.main-image-wrapper.is-pdf {
+     cursor: default;
+     background: #eee;
+}
+
+.lightbox-pdf-viewer {
+     width: 80vw;
+     height: 80vh;
+     border: none;
+     border-radius: var(--radius-lg);
+     background: #fff;
+}
+
+.lightbox-viewer.is-pdf {
+     max-width: 95vw;
+     max-height: 90vh;
+}
+
 /* Animaciones de entrada/salida */
 .fade-enter-active,
 .fade-leave-active {
@@ -1316,6 +1698,287 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
 
      .modal-header h2 {
           font-size: 1.2rem;
+     }
+}
+
+.main-image-wrapper.no-click {
+     cursor: default !important;
+}
+
+.pdf-main-preview {
+     width: 100%;
+     height: 100%;
+     min-height: 400px;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     background: var(--surface-card);
+     padding: 3rem;
+     text-align: center;
+}
+
+.pdf-icon-wrapper {
+     color: var(--primary-color);
+     margin-bottom: 2rem;
+     opacity: 0.8;
+}
+
+.pdf-actions {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     gap: 1rem;
+}
+
+.pdf-tag {
+     font-size: 0.75rem;
+     font-weight: 800;
+     text-transform: uppercase;
+     letter-spacing: 0.1em;
+     color: var(--text-muted);
+}
+
+.btn-view-doc {
+     background: var(--primary-color);
+     color: #fff;
+     padding: 0.8rem 1.5rem;
+     border-radius: var(--radius-md);
+     font-size: 0.85rem;
+     font-weight: 700;
+     text-decoration: none;
+     transition: all 0.3s;
+     box-shadow: var(--shadow-sm);
+}
+
+.btn-view-doc:hover {
+     transform: translateY(-2px);
+     box-shadow: var(--shadow-md);
+     filter: brightness(1.1);
+}
+
+.no-img-placeholder {
+     width: 100%;
+     height: 100%;
+     min-height: 400px;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     background: var(--surface-card);
+     color: var(--text-muted);
+     gap: 1.5rem;
+     font-size: var(--fs-sm);
+     font-weight: 700;
+     border-radius: var(--radius-lg);
+     border: 2px dashed var(--border-color);
+}
+
+.no-img-icon {
+     opacity: 0.4;
+     color: var(--primary-color);
+}
+
+.no-img-placeholder span {
+     opacity: 0.7;
+     text-transform: uppercase;
+     letter-spacing: 0.05em;
+}
+
+/* Authority Modal Specific Styles */
+.authority-wrapper {
+     display: flex;
+     align-items: center;
+     gap: 0.8rem;
+     flex-wrap: wrap;
+}
+
+.btn-authority-info {
+     display: inline-flex;
+     align-items: center;
+     gap: 0.4rem;
+     background: rgba(var(--primary-color-rgb), 0.1);
+     color: var(--primary-color);
+     border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+     padding: 0.3rem 0.7rem;
+     border-radius: var(--radius-full);
+     font-size: 10px;
+     font-weight: 800;
+     text-transform: uppercase;
+     letter-spacing: 0.05em;
+     transition: all 0.3s;
+     cursor: pointer;
+}
+
+.btn-authority-info:hover {
+     background: var(--primary-color);
+     color: #fff;
+     transform: translateY(-1px);
+     box-shadow: var(--shadow-sm);
+}
+
+.authority-modal-card {
+     max-width: 650px !important;
+}
+
+.authority-hero {
+     display: flex;
+     gap: 2rem;
+     margin-bottom: 2.5rem;
+     padding-bottom: 2.5rem;
+     border-bottom: 1px solid var(--border-color);
+}
+
+.authority-portrait {
+     width: 180px;
+     height: 180px;
+     border-radius: var(--radius-lg);
+     overflow: hidden;
+     background: var(--surface-card);
+     flex-shrink: 0;
+     border: 1px solid var(--border-color);
+}
+
+.authority-portrait img {
+     width: 100%;
+     height: 100%;
+     object-fit: cover;
+}
+
+.authority-portrait-placeholder {
+     width: 100%;
+     height: 100%;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     color: var(--text-muted);
+}
+
+.authority-main-info {
+     flex: 1;
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+}
+
+.authority-type-tag {
+     display: inline-block;
+     font-size: 10px;
+     font-weight: 800;
+     text-transform: uppercase;
+     color: var(--primary-color);
+     margin-bottom: 0.5rem;
+     letter-spacing: 0.1em;
+}
+
+.authority-name {
+     font-size: var(--fs-2xl);
+     margin: 0 0 0.5rem 0;
+     color: var(--text-primary);
+     line-height: 1.2;
+}
+
+.authority-subtitle {
+     font-size: 1rem;
+     color: var(--text-secondary);
+     font-style: italic;
+}
+
+.authority-desc-text {
+     font-size: 0.95rem;
+     line-height: 1.7;
+     color: var(--text-primary);
+     margin-bottom: 2rem;
+}
+
+.no-authority-details {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     padding: 4rem 2rem;
+     text-align: center;
+     background: rgba(var(--primary-color-rgb), 0.03);
+     border-radius: var(--radius-lg);
+     border: 1px dashed var(--border-color);
+     color: var(--text-muted);
+}
+
+.no-authority-details p {
+     font-size: 1rem;
+     font-weight: 600;
+}
+
+.authority-links-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+     gap: 1rem;
+}
+
+.authority-link-item {
+     display: flex;
+     align-items: center;
+     gap: 1rem;
+     padding: 0.8rem 1rem;
+     background: var(--surface-card);
+     border: 1px solid var(--border-color);
+     border-radius: var(--radius-md);
+     text-decoration: none;
+     transition: all 0.3s;
+}
+
+.authority-link-item:hover {
+     border-color: var(--primary-color);
+     transform: translateY(-2px);
+     box-shadow: var(--shadow-sm);
+}
+
+.auth-link-icon {
+     width: 36px;
+     height: 36px;
+     border-radius: var(--radius-sm);
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     font-size: 10px;
+     font-weight: 900;
+     color: #fff;
+     flex-shrink: 0;
+}
+
+.auth-link-details {
+     display: flex;
+     flex-direction: column;
+     min-width: 0;
+}
+
+.auth-link-label {
+     font-size: 10px;
+     text-transform: uppercase;
+     color: var(--text-muted);
+     font-weight: 700;
+}
+
+.auth-link-val {
+     font-size: 0.85rem;
+     color: var(--text-primary);
+     font-weight: 600;
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+}
+
+@media (max-width: 600px) {
+     .authority-hero {
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          gap: 1.5rem;
+     }
+
+     .authority-portrait {
+          width: 150px;
+          height: 150px;
      }
 }
 </style>
