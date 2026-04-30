@@ -2185,10 +2185,10 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
 /* PDF Export Template Styling */
 .pdf-export-template {
      display: none;
-     background: #ffffff;
-     color: #1a1a1a;
+     background: #ffffff !important;
+     color: #1a1a1a !important;
      padding: 40px;
-     font-family: var(--font-body, 'Inter', sans-serif);
+     font-family: 'Inter', sans-serif;
      width: 790px;
      max-width: 100%;
      box-sizing: border-box;
@@ -2196,29 +2196,29 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
 
 .pdf-header {
      text-align: center;
-     border-bottom: 2px solid var(--primary-color, #d4af37);
+     border-bottom: 2px solid #d4af37 !important;
      padding-bottom: 20px;
      margin-bottom: 30px;
 }
 
 .pdf-header h1 {
-     font-family: var(--font-heading, 'Playfair Display', serif);
+     font-family: 'Playfair Display', serif;
      font-size: 24pt;
      letter-spacing: 0.2em;
      margin: 0;
-     color: var(--text-primary, #1a1a1a);
+     color: #1a1a1a !important;
 }
 
 .pdf-header h2 {
      font-weight: 300;
      font-size: 14pt;
-     color: var(--primary-color, #d4af37);
+     color: #d4af37 !important;
      margin: 10px 0 5px 0;
 }
 
 .pdf-date {
      font-size: 9pt;
-     color: #888;
+     color: #888 !important;
 }
 
 .pdf-main-content {
@@ -2243,17 +2243,18 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
 }
 
 .pdf-title-section h3 {
-     font-family: var(--font-heading, 'Playfair Display', serif);
+     font-family: 'Playfair Display', serif;
      font-size: 20pt;
      line-height: 1.2;
      margin: 0 0 10px 0;
+     color: #1a1a1a !important;
 }
 
 .pdf-id-badge {
      display: inline-block;
      font-family: monospace;
-     background: rgba(212, 175, 55, 0.1);
-     color: var(--primary-color, #d4af37);
+     background: rgba(212, 175, 55, 0.1) !important;
+     color: #d4af37 !important;
      padding: 4px 8px;
      border-radius: 4px;
      font-size: 9pt;
@@ -2263,17 +2264,18 @@ watch(() => route.params.id, (id) => { if (id) fetchDetail(); });
 .pdf-description {
      font-size: 10pt;
      line-height: 1.6;
-     color: #444;
+     color: #444 !important;
      margin-bottom: 30px;
      text-align: justify;
 }
 
 .pdf-metadata-section h3 {
-     font-family: var(--font-heading, 'Playfair Display', serif);
+     font-family: 'Playfair Display', serif;
      font-size: 16pt;
-     border-bottom: 1px solid #eee;
+     border-bottom: 1px solid #eee !important;
      padding-bottom: 5px;
      margin-bottom: 15px;
+     color: #1a1a1a !important;
 }
 
 .pdf-metadata-table {

@@ -87,9 +87,9 @@ const isSaved = computed(() => {
                width: 32px;
                height: 32px;
                border-radius: 50%;
-               background: rgba(255, 255, 255, 0.9);
-               border: 1px solid var(--border-color, #ccc);
-               color: var(--text-secondary, #666);
+               background: var(--surface-color);
+               border: 1px solid var(--border-color);
+               color: var(--text-primary);
                display: flex;
                align-items: center;
                justify-content: center;

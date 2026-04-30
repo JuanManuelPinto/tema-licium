@@ -192,9 +192,9 @@ const thumbUrl = computed(() => {
      width: 36px;
      height: 36px;
      border-radius: 50%;
-     background: rgba(255, 255, 255, 0.9);
+     background: var(--surface-color);
      border: 1px solid var(--border-color);
-     color: var(--text-secondary);
+     color: var(--text-primary);
      display: flex;
      align-items: center;
      justify-content: center;
