@@ -467,8 +467,10 @@ const onPageChange = (p) => {
  */
 const getThumbnail = (path, size = 'large') => {
      if (!path) return '';
-     const domain = 'https://arcadium.cluster24.libnamic.eu';
-     let full = path.startsWith('http') ? path : `${domain}${path}`;
+     // const domain = 'https://arcadium.cluster24.libnamic.eu';
+     // let full = path.startsWith('http') ? path : `${domain}${path}`;
+     const sep = path.startsWith('/') || path.startsWith('http') ? '' : '/';
+     let full = path.startsWith('http') ? path : `${sep}${path}`;
      return full.replace(/size=\w+/, `size=${size}`);
 };
 

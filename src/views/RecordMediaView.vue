@@ -122,8 +122,10 @@ const ensureString = (val) => {
 const getThumbnail = (rawPath, size = 'large') => {
   const path = ensureString(rawPath);
   if (!path) return '';
-  const domain = 'https://arcadium.cluster24.libnamic.eu';
-  let full = path.startsWith('http') ? path : `${domain}${path}`;
+  // const domain = 'https://arcadium.cluster24.libnamic.eu';
+  // let full = path.startsWith('http') ? path : `${domain}${path}`;
+  const sep = path.startsWith('/') || path.startsWith('http') ? '' : '/';
+  let full = path.startsWith('http') ? path : `${sep}${path}`;
   return full.replace(/size=\w+/, `size=${size}`);
 };
 
@@ -147,31 +149,36 @@ const isPdf = (m) => {
 
 const getOriginalUrl = (m) => {
   if (!m) return '#';
-  const domain = 'https://arcadium.cluster24.libnamic.eu';
+  // const domain = 'https://arcadium.cluster24.libnamic.eu';
 
   // 1. Prioridad: URL directa del adjunto si está disponible en la respuesta
   const attachmentUrl = m.attachment?.url || m.url;
   if (attachmentUrl && typeof attachmentUrl === 'string') {
-    return attachmentUrl.startsWith('http') ? attachmentUrl : `${domain}${attachmentUrl}`;
+    // return attachmentUrl.startsWith('http') ? attachmentUrl : `${domain}${attachmentUrl}`;
+    const sep = attachmentUrl.startsWith('/') || attachmentUrl.startsWith('http') ? '' : '/';
+    return attachmentUrl.startsWith('http') ? attachmentUrl : `${sep}${attachmentUrl}`;
   }
 
   // 2. Prioridad: ID específico del adjunto (distinto del ID del medio)
   const attachmentId = m.attachment?.id || m.attachment_id;
   if (attachmentId) {
-    return `${domain}/api/core/attachment/action_get/file?attachment_id=${attachmentId}`;
+    // return `${domain}/api/core/attachment/action_get/file?attachment_id=${attachmentId}`;
+    return `/api/core/attachment/action_get/file?attachment_id=${attachmentId}`;
   }
 
   // 3. Fallback: ID del medio (para compatibilidad)
   const mediaId = getId(m);
   if (mediaId && mediaId !== '#') {
-    return `${domain}/api/core/attachment/action_get/file?attachment_id=${mediaId}`;
+    // return `${domain}/api/core/attachment/action_get/file?attachment_id=${mediaId}`;
+    return `/api/core/attachment/action_get/file?attachment_id=${mediaId}`;
   }
 
   // 4. Último recurso: Resolver por rutas
   const path = ensureString(m.path || m.thumbnail);
   if (!path || path === '#') return '#';
   const separator = path.startsWith('http') || path.startsWith('/') ? '' : '/';
-  return path.startsWith('http') ? path : `${domain}${separator}${path}`;
+  // return path.startsWith('http') ? path : `${domain}${separator}${path}`;
+  return path.startsWith('http') ? path : `${separator}${path}`;
 };
 
 const getId = (m) => {
@@ -267,7 +274,6 @@ onUnmounted(() => {
 }
 
 .media-card:hover {
-  transform: translateY(-5px);
   box-shadow: var(--shadow-md);
 }
 

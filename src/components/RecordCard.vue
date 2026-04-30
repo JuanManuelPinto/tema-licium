@@ -5,6 +5,16 @@
           <div class="image-container">
                <img :src="record.thumbnail || 'https://via.placeholder.com/300x200'"
                     :alt="record.title || 'Imagen de registro'">
+               
+               <!-- Botón de Plugin: Añadir al Portafolio -->
+               <button class="btn-workspace" :class="{ 'is-saved': isSaved }" @click.prevent="toggleWorkspace" :title="isSaved ? 'Quitar del Portafolio' : 'Guardar en Portafolio'">
+                    <svg v-if="!isSaved" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                         <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                    </svg>
+                    <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                         <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                    </svg>
+               </button>
           </div>
           <!-- Información básica: Título del registro -->
           <div class="info">
@@ -21,8 +31,27 @@
  * ser utilizada en rejillas de resultados o secciones de recomendaciones.
  */
 
+import { inject, computed } from 'vue';
+
 // Definición de las propiedades recibidas (props)
-defineProps(['record']);
+const props = defineProps(['record']);
+
+// Workspace API inyectada por el plugin
+const workspace = inject('workspace');
+
+const toggleWorkspace = (e) => {
+     e.preventDefault();
+     if (isSaved.value) {
+          workspace.removeItem(props.record.id, 'record');
+     } else {
+          workspace.addItem(props.record, 'record');
+     }
+};
+
+const isSaved = computed(() => {
+     if (!workspace) return false;
+     return workspace.hasItem(props.record.id, 'record');
+});
 </script>
 
 
@@ -38,18 +67,56 @@ defineProps(['record']);
      cursor: pointer;
 
      &:hover {
-          transform: translateY(-5px);
           box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
      }
 
      .image-container {
           height: 200px;
+          position: relative;
 
           img {
                width: 100%;
                height: 100%;
                object-fit: cover;
           }
+
+          .btn-workspace {
+               position: absolute;
+               bottom: 0.5rem;
+               right: 0.5rem;
+               width: 32px;
+               height: 32px;
+               border-radius: 50%;
+               background: rgba(255, 255, 255, 0.9);
+               border: 1px solid var(--border-color, #ccc);
+               color: var(--text-secondary, #666);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               cursor: pointer;
+               transition: all 0.2s;
+               opacity: 0;
+               transform: translateY(10px);
+               z-index: 10;
+          }
+     }
+
+     &:hover .btn-workspace {
+          opacity: 1;
+          transform: translateY(0);
+     }
+
+     .btn-workspace:hover {
+          background: var(--surface-color, #fff);
+          color: var(--primary-color, #0056b3);
+          transform: scale(1.1);
+     }
+
+     .btn-workspace.is-saved {
+          opacity: 1;
+          transform: translateY(0);
+          color: var(--primary-color, #0056b3);
+          border-color: var(--primary-color, #0056b3);
      }
 
      .info {

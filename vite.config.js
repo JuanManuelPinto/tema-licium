@@ -7,7 +7,8 @@ export default defineConfig({
      server: {
           proxy: {
                '/api': {
-                    target: 'https://arcadium.cluster24.libnamic.eu/',
+                    // target: 'https://arcadium.cluster24.libnamic.eu/',
+                    target: 'https://expobus.licium.libnamic.com/',
                     changeOrigin: true,
                     secure: false,
                }

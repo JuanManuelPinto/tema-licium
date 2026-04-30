@@ -136,8 +136,9 @@ const onSearch = () => {
  */
 const getLargeThumb = (path) => {
     if (!path) return '';
-    const domain = 'https://arcadium.cluster24.libnamic.eu';
-    let full = path.startsWith('http') ? path : `${domain}${path}`;
+    // const domain = 'https://arcadium.cluster24.libnamic.eu';
+    // let full = path.startsWith('http') ? path : `${domain}${path}`;
+    let full = path.startsWith('http') ? path : (path.startsWith('/') ? path : `/${path}`);
     return full.replace(/size=\w+/, 'size=large');
 };
 
@@ -343,7 +344,6 @@ onMounted(init);
 }
 
 .visual-tile:hover {
-    transform: translateY(-10px);
     box-shadow: var(--shadow-lg);
 }
 

@@ -17,6 +17,16 @@
 
                <!-- Etiqueta flotante que indica la tipografía del elemento (solo si hay imagen) -->
                <div class="card-badge" v-if="item.thumbnail">{{ typeLabel }}</div>
+
+               <!-- Botón de Plugin: Añadir al Portafolio -->
+               <button class="btn-workspace" :class="{ 'is-saved': isSaved }" @click.prevent="toggleWorkspace" :title="isSaved ? 'Quitar del Portafolio' : 'Guardar en Portafolio'">
+                    <svg v-if="!isSaved" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                         <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                    </svg>
+                    <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                         <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                    </svg>
+               </button>
           </div>
 
           <!-- Bloque de información: título, descripción condensada y llamada a la acción -->
@@ -40,7 +50,7 @@
  * de contenido (Registro o Colección).
  */
 
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
 
 const props = defineProps({
      // Datos crudos del elemento (API response)
@@ -51,6 +61,23 @@ const props = defineProps({
      viewMode: { type: String, default: 'grid' },
      // Invierte el orden de imagen/texto en el modo 'magazine'
      reverse: { type: Boolean, default: false }
+});
+
+// Workspace API inyectada por el plugin
+const workspace = inject('workspace');
+
+const toggleWorkspace = (e) => {
+     e.preventDefault(); // Evitar navegación al hacer clic en el botón
+     if (isSaved.value) {
+          workspace.removeItem(props.item.id, props.type);
+     } else {
+          workspace.addItem(props.item, props.type);
+     }
+};
+
+const isSaved = computed(() => {
+     if (!workspace) return false;
+     return workspace.hasItem(props.item.id, props.type);
 });
 
 // Genera la ruta de destino según el tipo de objeto
@@ -80,9 +107,11 @@ const cleanDesc = computed(() => {
  */
 const thumbUrl = computed(() => {
      if (!props.item.thumbnail) return '';
-     const domain = 'https://arcadium.cluster24.libnamic.eu';
+     // const domain = 'https://arcadium.cluster24.libnamic.eu';
      let path = props.item.thumbnail;
-     let full = path.startsWith('http') ? path : `${domain}${path}`;
+     // let full = path.startsWith('http') ? path : `${domain}${path}`;
+     const sep = path.startsWith('/') || path.startsWith('http') ? '' : '/';
+     let full = path.startsWith('http') ? path : `${sep}${path}`;
 
      // Ajuste de calidad y tamaño según el modo visual
      if (props.viewMode === 'magazine') return full.replace(/size=\w+/, 'size=large');
@@ -105,7 +134,6 @@ const thumbUrl = computed(() => {
 }
 
 .card-item:hover {
-     transform: translateY(-8px);
      box-shadow: var(--shadow-md);
      border-color: var(--primary-color);
 }
@@ -140,11 +168,7 @@ const thumbUrl = computed(() => {
      height: 100%;
      object-fit: contain;
      padding: 1.5rem;
-     transition: transform var(--transition-slow);
-}
-
-.card-item:hover .card-img {
-     transform: scale(1.05);
+     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card-badge {
@@ -159,6 +183,44 @@ const thumbUrl = computed(() => {
      text-transform: uppercase;
      color: var(--primary-color);
      backdrop-filter: blur(4px);
+}
+
+.btn-workspace {
+     position: absolute;
+     bottom: 1rem;
+     right: 1rem;
+     width: 36px;
+     height: 36px;
+     border-radius: 50%;
+     background: rgba(255, 255, 255, 0.9);
+     border: 1px solid var(--border-color);
+     color: var(--text-secondary);
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     cursor: pointer;
+     transition: all 0.2s;
+     z-index: 10;
+     opacity: 0;
+     transform: translateY(10px);
+}
+
+.card-item:hover .btn-workspace {
+     opacity: 1;
+     transform: translateY(0);
+}
+
+.btn-workspace:hover {
+     background: var(--surface-color);
+     color: var(--primary-color);
+     transform: scale(1.1) !important;
+}
+
+.btn-workspace.is-saved {
+     opacity: 1;
+     transform: translateY(0);
+     color: var(--primary-color);
+     border-color: var(--primary-color);
 }
 
 .card-body {
